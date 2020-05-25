@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2fe2d24e-acfe-4cd7-a915-2215f7a9f837" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Jupyter Notebook" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="JupyterTrust" id="3ec94ace-540c-4238-8741-b428e45c9c68" />
+  <component name="ProjectId" id="1b5IJaAnNDscT9imzktW6BIZPrM" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ex1" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="AI_Robotics_SS20" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="AI_Robotics_SS20" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/ex1" />
+      <recent name="$PROJECT_DIR$/ex3_opencv" />
+      <recent name="$PROJECT_DIR$/ex4_grasp" />
+      <recent name="$PROJECT_DIR$/ex2_motion" />
+      <recent name="$PROJECT_DIR$/../.local/lib/python3.8/site-packages" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.ex4">
+    <configuration name="ex2" type="PythonConfigurationType" factoryName="Python">
+      <module name="AI_Robotics_SS20" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="LD_LIBRARY_PATH" value="$PROJECT_DIR$/../opt/physx3.4/lib" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ex2_motion" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex2_motion/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ex3" type="PythonConfigurationType" factoryName="Python">
+      <module name="AI_Robotics_SS20" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="LD_LIBRARY_PATH" value="$PROJECT_DIR$/../opt/physx3.4/lib" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../anaconda3/envs/rai/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ex3_opencv" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex3_opencv/ex3.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ex4" type="PythonConfigurationType" factoryName="Python">
+      <module name="AI_Robotics_SS20" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="LD_LIBRARY_PATH" value="$PROJECT_DIR$/../opt/physx3.4/lib" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../anaconda3/envs/rai/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ex4_grasp" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex4_grasp/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.ex2" />
+      <item itemvalue="Python.ex3" />
+      <item itemvalue="Python.ex4" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2fe2d24e-acfe-4cd7-a915-2215f7a9f837" name="Default Changelist" comment="" />
+      <created>1587915456708</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1587915456708</updated>
+      <workItem from="1587915459364" duration="19000" />
+      <workItem from="1587915479918" duration="717000" />
+      <workItem from="1587916706873" duration="1266000" />
+      <workItem from="1588073957609" duration="272000" />
+      <workItem from="1588074272725" duration="12648000" />
+      <workItem from="1588148909349" duration="965000" />
+      <workItem from="1588426075217" duration="716000" />
+      <workItem from="1588426807623" duration="960000" />
+      <workItem from="1588427782608" duration="10095000" />
+      <workItem from="1588576079380" duration="12591000" />
+      <workItem from="1588631161033" duration="2501000" />
+      <workItem from="1588681581100" duration="1759000" />
+      <workItem from="1588687139309" duration="4907000" />
+      <workItem from="1588707274338" duration="3994000" />
+      <workItem from="1588714343745" duration="1497000" />
+      <workItem from="1588715860379" duration="2000" />
+      <workItem from="1588717195149" duration="373000" />
+      <workItem from="1589277944173" duration="178000" />
+      <workItem from="1589289657905" duration="6765000" />
+      <workItem from="1589453169259" duration="3184000" />
+      <workItem from="1589456516361" duration="31756000" />
+      <workItem from="1589549938894" duration="2784000" />
+      <workItem from="1589721514371" duration="1230000" />
+      <workItem from="1589735936004" duration="6002000" />
+      <workItem from="1589759423203" duration="3143000" />
+      <workItem from="1589899216782" duration="6199000" />
+      <workItem from="1589984144244" duration="8931000" />
+      <workItem from="1590237883207" duration="648000" />
+      <workItem from="1590244270854" duration="32826000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="793" y="250" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1589454692204">
+      <screen x="331" y="0" width="2229" height="1440" />
+    </state>
+    <state x="793" y="250" key="#com.intellij.execution.impl.EditConfigurationsDialog/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589454692204" />
+    <state x="451" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1588714856035" />
+    <state x="744" y="420" width="488" height="264" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1588708931446">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="744" y="420" width="488" height="264" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/67.27.1853.1053@67.27.1853.1053" timestamp="1588708931446" />
+    <state x="833" y="294" width="691" height="516" key="EnvironmentVariablesDialog" timestamp="1588080916173">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="833" y="294" width="691" height="516" key="EnvironmentVariablesDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1588080916173" />
+    <state x="1184" y="387" width="495" height="484" key="FileChooserDialogImpl" timestamp="1589454239959">
+      <screen x="331" y="0" width="2229" height="1440" />
+    </state>
+    <state x="1184" y="387" key="FileChooserDialogImpl/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589454239959" />
+    <state x="776" y="310" width="495" height="484" key="FileChooserDialogImpl/67.27.1853.1053@67.27.1853.1053" timestamp="1588717243819" />
+    <state width="1807" height="326" key="GridCell.Tab.0.bottom" timestamp="1590353172827">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="405" key="GridCell.Tab.0.bottom/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
+    <state width="1807" height="326" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1590353172827" />
+    <state width="1807" height="326" key="GridCell.Tab.0.center" timestamp="1590353172826">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="405" key="GridCell.Tab.0.center/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
+    <state width="1807" height="326" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1590353172826" />
+    <state width="1807" height="326" key="GridCell.Tab.0.left" timestamp="1590353172825">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="405" key="GridCell.Tab.0.left/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
+    <state width="1807" height="326" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1590353172825" />
+    <state width="1807" height="326" key="GridCell.Tab.0.right" timestamp="1590353172826">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="405" key="GridCell.Tab.0.right/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
+    <state width="1807" height="326" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1590353172826" />
+    <state width="1807" height="343" key="GridCell.Tab.1.bottom" timestamp="1590352892654">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="498" key="GridCell.Tab.1.bottom/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589489602917" />
+    <state width="1807" height="343" key="GridCell.Tab.1.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1590352892654" />
+    <state width="1807" height="343" key="GridCell.Tab.1.center" timestamp="1590352892653">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="498" key="GridCell.Tab.1.center/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589489602917" />
+    <state width="1807" height="343" key="GridCell.Tab.1.center/67.27.1853.1053@67.27.1853.1053" timestamp="1590352892653" />
+    <state width="1807" height="343" key="GridCell.Tab.1.left" timestamp="1590352892653">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="498" key="GridCell.Tab.1.left/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589489602917" />
+    <state width="1807" height="343" key="GridCell.Tab.1.left/67.27.1853.1053@67.27.1853.1053" timestamp="1590352892653" />
+    <state width="1807" height="343" key="GridCell.Tab.1.right" timestamp="1590352892654">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="2514" height="498" key="GridCell.Tab.1.right/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589489602917" />
+    <state width="1807" height="343" key="GridCell.Tab.1.right/67.27.1853.1053@67.27.1853.1053" timestamp="1590352892654" />
+    <state x="821" y="384" key="SettingsEditor" timestamp="1589457746432">
+      <screen x="331" y="0" width="2229" height="1440" />
+    </state>
+    <state x="821" y="384" key="SettingsEditor/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589457746432" />
+    <state x="474" y="308" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1589295317601" />
+    <state width="600" height="428" key="javadoc.popup" timestamp="1590337997363">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="301" height="83" key="javadoc.popup.new" timestamp="1590021886965">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="301" height="83" key="javadoc.popup.new/67.27.1853.1053@67.27.1853.1053" timestamp="1590021886965" />
+    <state width="600" height="428" key="javadoc.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1590337997363" />
+    <state x="294" y="257" width="672" height="678" key="search.everywhere.popup" timestamp="1588426207968">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="294" y="257" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1588426207968" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$ex3.coverage" NAME="ex3 Coverage Results" MODIFIED="1589464234017" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex3_opencv" />
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$main.coverage" NAME="main Coverage Results" MODIFIED="1589289907276" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex2" />
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1589295178075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex3" />
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$test.coverage" NAME="main Coverage Results" MODIFIED="1588437790516" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex2" />
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$easy_install.coverage" NAME="easy_install Coverage Results" MODIFIED="1588709234730" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../anaconda3/envs/rai/lib/python3.8/site-packages" />
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1588715082712" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex1" />
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$ex4.coverage" NAME="ex4 Coverage Results" MODIFIED="1590353305884" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex4_grasp" />
+    <SUITE FILE_PATH="coverage/AI_Robotics_SS20$ex2.coverage" NAME="ex2 Coverage Results" MODIFIED="1590328218228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex2_motion" />
+  </component>
+</project>
