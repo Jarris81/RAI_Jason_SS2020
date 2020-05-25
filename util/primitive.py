@@ -74,7 +74,7 @@ def lift_up(C, n_steps, duration, gripper, goal, V, hold=False):
     # set config to get joint config
     C.setFrameState(goal_config)
     if V:
-        print("Displaying Lift-Up Config")
+        print("Displaying Lift-Up   Config")
         V.setConfiguration(C)
         time.sleep(5)
     goal_joint_config = C.getJointState()
