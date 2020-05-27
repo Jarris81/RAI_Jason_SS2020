@@ -57,12 +57,12 @@ def lift_up(C, n_steps, duration, gripper, goal, V, hold=False):
 
     # get new position
     goal_position = C.frame(gripper).getPosition()
-    goal_position[2] = goal_position[2] + 1.5
+    goal_position[2] = goal_position[2] + 1.0
     q = C.getJointState()
-    print(q)
+    # print(q)
     mask_gripper = [0] * 16
-    mask_gripper[-1] = 1
-    mask_gripper[7] = 1
+    # mask_gripper[-1] = 1
+    # mask_gripper[7] = 1
     iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=q, scale=mask_gripper)
     iK.addObjective(type=ry.OT.sos, feature=ry.FS.position,
                     frames=[gripper], scale=[1] * 3, target=goal_position)
@@ -76,7 +76,7 @@ def lift_up(C, n_steps, duration, gripper, goal, V, hold=False):
     if V:
         print("Displaying Lift-Up   Config")
         V.setConfiguration(C)
-        time.sleep(5)
+        time.sleep(2)
     goal_joint_config = C.getJointState()
     C.setFrameState(start_config)
     komo = C.komo_path(1, n_steps, duration, True)
@@ -91,9 +91,11 @@ def top_grasp(C, n_steps, duration, gripper, goal, V, hold=False):
     start_config = C.getFrameState()
     iK = C.komo_IK(False)
     # mask for gripper
-    iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[gripper, goal], target=[0.0, 0.0, -0.07], scale=[1e2]*3)
-    iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductZZ, frames=[goal, gripper], target=[1], scale=[3])
-    iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductXY, frames=[goal, gripper], target=[1], scale=[3])
+    iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[gripper, goal], target=[0.0, 0.0, -0.07], scale=[1])
+    iK.addObjective(type=ry.OT.sos, feature=ry.FS.positionDiff, frames=[gripper, goal], target=[0.0, 0.0, 0.0],
+                    scale=[2])
+    iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductZZ, frames=[goal, gripper], target=[1], scale=[1])
+    iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductXY, frames=[goal, gripper], target=[1], scale=[1])
     iK.addObjective(type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal])
     # no contact
     iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions)
@@ -106,19 +108,28 @@ def top_grasp(C, n_steps, duration, gripper, goal, V, hold=False):
     if V:
         print("Displaying Top Grasp Config")
         V.setConfiguration(C)
-        time.sleep(5)
+        time.sleep(2)
+
     goal_joint_config = C.getJointState()
     C.setFrameState(start_config)
 
     # generate motion
     komo = C.komo_path(1, n_steps, duration, True)
-    komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e2] * 16, order=2)
-    komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=goal_joint_config, scale=[1e1] * 16)
-    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e1])
-    komo.addObjective(time=[0.8, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductZZ, frames=[goal, gripper], target=[1], scale=[1e3])
-    komo.addObjective(time=[0.8, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductXY, frames=[goal, gripper], target=[1], scale=[1e3])
-    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal], scale=[1e3])
+    komo.addObjective(time=[0.8,1.], type=ry.OT.eq, feature=ry.FS.qItself, scale=[1e3] * 16, order=2)
+    komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=goal_joint_config,
+                      scale=[10] * 16)
+    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1])
+    #komo.addObjective(time=[0.9, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductZZ, frames=[goal, gripper],
+     #                 target=[1], scale=[1])
+    #komo.addObjective(time=[0.9, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductXY, frames=[goal, gripper],
+     #                 target=[1], scale=[1])
+    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal], scale=[1])
     komo.optimize()
+
+    V2 = komo.view()
+    time.sleep(2)
+    V2.playVideo()
+    time.sleep(2)
     return komo
 
 
@@ -127,10 +138,10 @@ def side_grasp(C, n_steps, duration, gripper, goal, V, hold=False):
 
     # generate goal configuration
     iK = C.komo_IK(False)
-    iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[gripper, goal], target=[0.0, 0.0, -0.02])
-    iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductXX, frames=[gripper, goal], target=[-1])
+    iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[gripper, goal], target=[0.0, 0.0, -0.07])
+    iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductXX, frames=[gripper, goal], target=[-1], scale=[1e2])
     iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductYZ, frames=[goal, gripper], target=[-1])
-    iK.addObjective(type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal])
+    iK.addObjective(type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal], scale=[1e1])
     # no contact
     iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions)
     iK.optimize()
@@ -141,17 +152,18 @@ def side_grasp(C, n_steps, duration, gripper, goal, V, hold=False):
     if V:
         print("Displaying Side Grasp Config")
         V.setConfiguration(C)
-        time.sleep(5)
+        time.sleep(2)
     goal_joint_config = C.getJointState()
     C.setFrameState(start_config)
 
     # generate motion
     komo = C.komo_path(1, n_steps, duration, True)
-    komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e1] * 16, order=2)
-    komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=goal_joint_config, scale=[1e2] * 16)
-    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e1])
-    komo.addObjective(time=[0.8, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductYZ, frames=[gripper, goal], target=[-1], scale=[3])
-    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal], scale=[1e2])
+    komo.addObjective(time=[0.8,1.], type=ry.OT.eq, feature=ry.FS.qItself, scale=[1e3] * 16, order=2)
+    komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=goal_joint_config, scale=[1] * 16)
+    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1])
+    komo.addObjective(time=[0.8, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductYZ, frames=[gripper, goal],
+                      target=[-1], scale=[1e3])
+    komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal], scale=[1e3])
     komo.optimize()
     return komo
 

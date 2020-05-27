@@ -44,12 +44,70 @@ def get_red_ball_contours(frame, background, cameraFrame, fxypxy, vis=False):
         depths = frame[1][mask]
 
         depths = np.reshape(depths, (len(depths), 1))
+        if depths.shape[0] != cont.shape[0] or len(cont) < 30:
+            continue
         cont_depth = np.hstack((cont, depths))
         cont_3D = np.asarray([tf.camera_to_world(pt, cameraFrame, fxypxy) for pt in cont_depth])
 
         red_ball_mid_points.append(cont_3D.mean(axis=0))
     return np.asarray(red_ball_mid_points)
 
+
+def get_red_ball_hough(frame, background, cameraFrame, fxypxy, vis=False):
+    # get all masks we want to apply, to get the red ball
+    score, diff = get_diff_combined(background, frame, color=False)
+    diff = (diff * 255).astype(np.uint8)  # convert to 255 image
+    mask1 = cv.threshold(diff, 0, 255, cv.THRESH_BINARY_INV | cv.THRESH_OTSU)[1]
+    mask2 = filter_color(frame[0], [115, 100, 100], [130, 255, 255])  # red filter
+    mask = np.bitwise_and(mask1.astype(bool), mask2.astype(bool)).astype(np.uint8)  # combine masks
+
+    # apply filters
+    rgb_masked = cv.bitwise_and(frame[0], frame[0], mask=mask)
+    depth_masked = cv.bitwise_and(frame[1], frame[1], mask=mask)
+
+    # get contours, will be used to count objects
+    rows = rgb_masked.shape[0]
+    mask_im = (mask * 255).astype(np.uint8)
+    circles =cv.HoughCircles(mask_im, cv.HOUGH_GRADIENT, 1, rows / 8,
+                               param1=100, param2=10,
+                               minRadius=5, maxRadius=12)
+
+    # if no contours was detected, we can stop
+    if vis:
+        cv.imshow('OPENCV - mask', mask_im)
+        cv.waitKey(1)
+    if circles is None:
+        return []
+    #white = np.ones_like(mask_im)
+    if vis:
+        circles = np.uint16(np.around(circles))
+        for i in circles[0, :]:
+            center = (i[0], i[1])
+            # circle center
+            cv.circle(frame[0], center, 1, (0, 0, 255), 2)
+            # circle outline
+            radius = i[2]
+            cv.circle(frame[0], center, radius, (0, 255, 0), 2)
+        if len(circles) > 0:
+            cv.imshow('OPENCV - circles', frame[0])
+        cv.waitKey(1)
+    print(len(circles))
+    return circles
+
+    # for cont in contours:
+    #     cont = np.vstack(cont)
+    #     mask = np.zeros_like(frame[1]).astype(np.bool)
+    #     mask[cont[:, 1], cont[:, 0]] = 1
+    #     depths = frame[1][mask]
+    #
+    #     depths = np.reshape(depths, (len(depths), 1))
+    #     if depths.shape[0] != cont.shape[0]:
+    #         continue
+    #     cont_depth = np.hstack((cont, depths))
+    #     cont_3D = np.asarray([tf.camera_to_world(pt, cameraFrame, fxypxy) for pt in cont_depth])
+    #
+    #     red_ball_mid_points.append(cont_3D.mean(axis=0))
+    # return np.asarray(red_ball_mid_points)
 
 
 def extract_background(S, duration=5, fps=1):
