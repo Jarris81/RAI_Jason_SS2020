@@ -831,7 +831,7 @@
 /home/jason/git/robotics-course/rai/rai/Kin/simulation.cpp:closeGripper:249(1) initiating grasp of object table (if this is not what you expect, did you setContact(1) for the object you want to grasp?)
 /home/jason/git/robotics-course/rai/rai/Kin/simulation.cpp:closeGripper:249(1) initiating grasp of object table (if this is not what you expect, did you setContact(1) for the object you want to grasp?)
 /home/jason/git/robotics-course/rai/rai/Kin/simulation.cpp:closeGripper:249(1) initiating grasp of object table (if this is not what you expect, did you setContact(1) for the object you want to grasp?)
-** execution stop: 2020-05-26_17:37:25.572154
-** real time: 73.7904sec
-** CPU time: 39.84sec
-** system (includes I/O) time: 3.37sec
+** execution stop: 2020-05-28_16:10:16.361130
+** real time: 65.7947sec
+** CPU time: 30.68sec
+** system (includes I/O) time: 2.54sec

@@ -37,14 +37,13 @@ if __name__ == "__main__":
     goals = []
     goals_stored = 3
 
-    state = 1
+    state = 0
 
     hasGoal = False
     komo = 0
 
     retry= 0
 
-    goal_pos = 0
 
     # start simulation loop
     for t in range(1000):
@@ -58,47 +57,46 @@ if __name__ == "__main__":
             goal = perc.get_red_ball_contours(frame, back_frame, cameraFrame, fxfypxpy, vis=True)
             if len(goal):
                 goals.append(goal)
-                print("new goal is:", goal)
             if len(goals) > goals_stored:
                 goals.pop(0)
-
-        if state == 1:
-
             if check_if_goal_constant(goals, tolerance=0.5):
                 # get the closest ball and set as goal
-                print("---------------Number of goals: ", len(goals[-1]))
                 goal_arg = geom.closest_point(C.frame("R_gripper").getPosition(), goals[-1])
                 goal_pos = goals[-1][goal_arg]
                 set_goal_ball(C, V, goal_pos, 0.03)
+                hasGoal = True
 
-                # generate top grasp
-                top_grasp = prim.Primitive(C, S, prim.top_grasp ,tau, t, 100, "R_gripper", grasping=True, V=V)
-                state = 2
+        # do nothing state, wait for something to happen
+        if state == 0:
+            if hasGoal:
+                state = 1
+
+        if state == 1:
+            # generate top grasp
+            top_grasp = prim.TopGrasp(C, S, tau, t, 100,"R_gripper", V=V)
+            state = 2
 
         if state == 2:
-            print("!!!!!!!!!!!! ", len(goals), " !!!!!!!!!!!!!")
-            if np.isclose(goal_pos, goals[-1][0], atol=0.04).all():
-                print(goal_pos)
-                print(goals[-1][0])
-                if not top_grasp.is_done(t):
+            if top_grasp.goal_changed_cond():
+                if not top_grasp.is_done_cond(t):
                     top_grasp.step(t)
                     V.setConfiguration(C)
                 else:
-                    print("is done with grasp")
                     state = 3
             else:
                 # get the closest ball and set as goal
-                print("Goal changed")
                 state = 1
 
         if state == 3:
-            lift_up = prim.Primitive(C, S, prim.lift_up, tau, t, 50, "R_gripper", grasping=False, V=V, hold=True)
-            print("lifting up")
+            lift_up = prim.LiftUp(C, S, tau, t, 50, "R_gripper", V=V)
             state = 4
         if state == 4:
-            if not lift_up.is_done(t):
+            if not lift_up.is_done_cond(t):
                 lift_up.step(t)
                 V.setConfiguration(C)
+            else:
+                state = 5
+                print("is done lifting")
 
 
         else:
