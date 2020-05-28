@@ -1,14 +1,25 @@
 import libry as ry
+import util.perception as perc
 from os.path import join
 
 pathRepo = '/home/jason/git/robotics-course/'
 
 
-def setup_challenge_env(add_red_ball=False, number_objects=30):
+def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=False):
 
-    # -- Add REAL WORLD configuration and camera
+    # -- Add empty REAL WORLD configuration and camera
+    R = ry.Config()
+    R.addFile(join(pathRepo, "scenarios/pandasTable.g"))
+    S = R.simulation(ry.SimulatorEngine.physx, True)
+    S.addSensor("camera")
+
+    back_frame = perc.extract_background(S, duration=2, vis=show_background)
+
     R = ry.Config()
     R.addFile(join(pathRepo, "scenarios/challenge.g"))
+
+    # Change color of objects
+    S.addSensor("camera")
 
     if add_red_ball:
         # only add 1 red ball
@@ -41,11 +52,11 @@ def setup_challenge_env(add_red_ball=False, number_objects=30):
     V = ry.ConfigurationViewer()
     V.setConfiguration(C)
     C.addFrame("goal")
-    C.addFrame("goal2")
 
-    return R, S, C, V
+    return R, S, C, V, back_frame
 
-def setup_camera(C, f):
+
+def setup_camera(C):
     # setup camera
     cameraFrame = C.frame("camera")
     # the focal length

@@ -259,7 +259,7 @@ def ex3a(C):
         komo.addObjective([], ry.FS.accumulatedCollisions, [], ry.OT.ineq, [1e2])
         komo.optimize(True)
 
-        return komo;
+        return komo
 
     # visualize
     V = ry.ConfigurationViewer()

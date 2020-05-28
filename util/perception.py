@@ -110,7 +110,7 @@ def get_red_ball_hough(frame, background, cameraFrame, fxypxy, vis=False):
     # return np.asarray(red_ball_mid_points)
 
 
-def extract_background(S, duration=5, fps=1):
+def extract_background(S, duration=5, fps=1, vis=False):
 
     n = duration * fps
     background_rgb, background_depth = [], []
@@ -123,6 +123,14 @@ def extract_background(S, duration=5, fps=1):
 
     background_rgb = np.average(background_rgb, axis=0).astype(np.uint8)
     background_depth = np.average(background_depth, axis=0).astype(np.float32)
+
+    if vis:
+        while True:
+            cv.imshow('RGB-Background', background_rgb)
+            cv.imshow('Depth-Background', background_depth)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                cv.destroyAllWindows()
+                break
 
     return [background_rgb, background_depth]
 

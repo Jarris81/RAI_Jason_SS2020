@@ -2,6 +2,7 @@ import sys
 import cv2 as cv
 import libry as ry
 from util.setup import setup_challenge_env
+from util.setup import setup_camera
 import util.perception as perc
 import util.geom as geom
 import numpy as np
@@ -17,20 +18,10 @@ pathRepo = '/home/jason/git/robotics-course/'
 
 if __name__ == "__main__":
 
-    # setup env
-    R, S, C, V = setup_challenge_env(True)
+    # setup env and get background
+    R, S, C, V, back_frame = setup_challenge_env(True, 0, show_background=True)
+    cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
 
-    # setup camera
-    cameraFrame = C.frame("camera")
-    # the focal length
-    f = 0.895
-    f = f * 360.
-    fxfypxpy = [f, f, 320., 180.]
-
-    # get background
-    back_frame = perc.extract_background(S, duration=2)
-
-    points = []
     tau = .01
     rate_camera = 10
 
@@ -40,10 +31,6 @@ if __name__ == "__main__":
     state = 0
 
     hasGoal = False
-    komo = 0
-
-    retry= 0
-
 
     # start simulation loop
     for t in range(1000):
@@ -73,7 +60,7 @@ if __name__ == "__main__":
 
         if state == 1:
             # generate top grasp
-            top_grasp = prim.TopGrasp(C, S, tau, t, 100,"R_gripper", V=V)
+            top_grasp = prim.TopGrasp(C, S, tau, t, 100, "R_gripper", V=V)
             state = 2
 
         if state == 2:

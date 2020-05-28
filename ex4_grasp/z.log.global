@@ -4,6 +4,177 @@
 
 /home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path '/home/jason/git/robotics-course/scenarios' from '/home/jason/RAI_Jason_SS2020/ex4_grasp'
 
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'pandasTable.g'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'panda_moveGripper.g'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path '../rai-robotModels/panda' from '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'panda_clean.g'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'gripper.g'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'panda_moveGripper.g'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path '../rai-robotModels/panda' from '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'panda_clean.g'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'gripper.g'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link0.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link1.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link2.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link3.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link4.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link5.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link6.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link7.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link0.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link1.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link2.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link3.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link4.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link5.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link6.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path 'meshes/visual' from '/home/jason/git/robotics-course/rai-robotModels/panda'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'link7.ply'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/RAI_Jason_SS2020/ex4_grasp'
+
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:PhysXInterface:152(0) starting PhysX engine ...
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:PhysXInterface:194(0) ... done starting PhysX engine
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:PhysXInterface:195(0) creating Configuration within PhysX ...
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'world' as static
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint1' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint2' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint3' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint4' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint5' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint6' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint7' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_panda_joint8' as static
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_finger1' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'L_finger2' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint1' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint2' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint3' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint4' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint5' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint6' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint7' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_panda_joint8' as static
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_finger1' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'R_finger2' as kinematic
+/home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:PhysXInterface:206(0) ... done creating Configuration within PhysX
+/home/jason/git/robotics-course/rai/rai/Core/graph.cpp:RegistryInitializer:1338(3) opening config file 'rai.cfg'
+/home/jason/git/robotics-course/rai/rai/Core/graph.cpp:RegistryInitializer:1344(3)  - failed
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/RAI_Jason_SS2020/ex4_grasp'
+
+/home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path '/home/jason/git/robotics-course/scenarios' from '/home/jason/RAI_Jason_SS2020/ex4_grasp'
+
 /home/jason/git/robotics-course/rai/rai/Core/util.cpp:getIs:1171(3) opening input file 'challenge.g'
 
 /home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/git/robotics-course/scenarios'
@@ -183,8 +354,6 @@
 /home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'obj0' as dynamic
 /home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:addLink:479(0) adding link anchored at 'obj1' as dynamic
 /home/jason/git/robotics-course/rai/rai/Kin/kin_physx.cpp:PhysXInterface:206(0) ... done creating Configuration within PhysX
-/home/jason/git/robotics-course/rai/rai/Core/graph.cpp:RegistryInitializer:1338(3) opening config file 'rai.cfg'
-/home/jason/git/robotics-course/rai/rai/Core/graph.cpp:RegistryInitializer:1344(3)  - failed
 /home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_start:1134(3) entering path '/home/jason/RAI_Jason_SS2020/ex4_grasp'
 
 /home/jason/git/robotics-course/rai/rai/Core/util.cpp:cd_file:1142(3) entering path '/home/jason/git/robotics-course/scenarios' from '/home/jason/RAI_Jason_SS2020/ex4_grasp'
@@ -831,7 +1000,7 @@
 /home/jason/git/robotics-course/rai/rai/Kin/simulation.cpp:closeGripper:249(1) initiating grasp of object table (if this is not what you expect, did you setContact(1) for the object you want to grasp?)
 /home/jason/git/robotics-course/rai/rai/Kin/simulation.cpp:closeGripper:249(1) initiating grasp of object table (if this is not what you expect, did you setContact(1) for the object you want to grasp?)
 /home/jason/git/robotics-course/rai/rai/Kin/simulation.cpp:closeGripper:249(1) initiating grasp of object table (if this is not what you expect, did you setContact(1) for the object you want to grasp?)
-** execution stop: 2020-05-28_16:10:16.361130
-** real time: 65.7947sec
-** CPU time: 30.68sec
-** system (includes I/O) time: 2.54sec
+** execution stop: 2020-05-28_17:18:28.289560
+** real time: 75.1507sec
+** CPU time: 48.01sec
+** system (includes I/O) time: 2.46sec

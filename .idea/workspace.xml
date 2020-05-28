@@ -24,9 +24,11 @@
   <component name="ChangeListManager">
     <list default="true" id="2fe2d24e-acfe-4cd7-a915-2215f7a9f837" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ex2_motion/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex2_motion/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ex4_grasp/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex4_grasp/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ex4_grasp/z.log.global" beforeDir="false" afterPath="$PROJECT_DIR$/ex4_grasp/z.log.global" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/primitive.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/primitive.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/perception.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/perception.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,7 +206,7 @@
       <workItem from="1590422845131" duration="11784000" />
       <workItem from="1590502968561" duration="3356000" />
       <workItem from="1590590084228" duration="1025000" />
-      <workItem from="1590665317015" duration="8288000" />
+      <workItem from="1590665317015" duration="11895000" />
     </task>
     <servers />
   </component>
@@ -242,26 +244,26 @@
     </state>
     <state x="1184" y="387" key="FileChooserDialogImpl/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589454239959" />
     <state x="776" y="310" width="495" height="484" key="FileChooserDialogImpl/67.27.1853.1053@67.27.1853.1053" timestamp="1588717243819" />
-    <state width="1807" height="335" key="GridCell.Tab.0.bottom" timestamp="1590674950135">
+    <state width="1807" height="335" key="GridCell.Tab.0.bottom" timestamp="1590679032724">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="2514" height="405" key="GridCell.Tab.0.bottom/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
-    <state width="1807" height="335" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1590674950135" />
-    <state width="1807" height="335" key="GridCell.Tab.0.center" timestamp="1590674950134">
+    <state width="1807" height="335" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1590679032724" />
+    <state width="1807" height="335" key="GridCell.Tab.0.center" timestamp="1590679032723">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="2514" height="405" key="GridCell.Tab.0.center/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
-    <state width="1807" height="335" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1590674950134" />
-    <state width="1807" height="335" key="GridCell.Tab.0.left" timestamp="1590674950133">
+    <state width="1807" height="335" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1590679032723" />
+    <state width="1807" height="335" key="GridCell.Tab.0.left" timestamp="1590679032722">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="2514" height="405" key="GridCell.Tab.0.left/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
-    <state width="1807" height="335" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1590674950133" />
-    <state width="1807" height="335" key="GridCell.Tab.0.right" timestamp="1590674950134">
+    <state width="1807" height="335" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1590679032722" />
+    <state width="1807" height="335" key="GridCell.Tab.0.right" timestamp="1590679032723">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="2514" height="405" key="GridCell.Tab.0.right/264.1440.1920.1080/331.0.2229.1440@331.0.2229.1440" timestamp="1589493480454" />
-    <state width="1807" height="335" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1590674950134" />
+    <state width="1807" height="335" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1590679032723" />
     <state width="1807" height="343" key="GridCell.Tab.1.bottom" timestamp="1590352892654">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -318,7 +320,7 @@
     <SUITE FILE_PATH="coverage/AI_Robotics_SS20$test.coverage" NAME="main Coverage Results" MODIFIED="1588437790516" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex2" />
     <SUITE FILE_PATH="coverage/AI_Robotics_SS20$easy_install.coverage" NAME="easy_install Coverage Results" MODIFIED="1588709234730" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../anaconda3/envs/rai/lib/python3.8/site-packages" />
     <SUITE FILE_PATH="coverage/AI_Robotics_SS20$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1588715082712" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex1" />
-    <SUITE FILE_PATH="coverage/RAI_Jason_SS2020$ex4.coverage" NAME="ex4 Coverage Results" MODIFIED="1590674950118" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex4_grasp" />
+    <SUITE FILE_PATH="coverage/RAI_Jason_SS2020$ex4.coverage" NAME="ex4 Coverage Results" MODIFIED="1590679032711" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex4_grasp" />
     <SUITE FILE_PATH="coverage/AI_Robotics_SS20$ex4.coverage" NAME="ex4 Coverage Results" MODIFIED="1590353305884" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex4_grasp" />
     <SUITE FILE_PATH="coverage/AI_Robotics_SS20$ex2.coverage" NAME="ex2 Coverage Results" MODIFIED="1590328218228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ex2_motion" />
   </component>
