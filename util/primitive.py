@@ -1,18 +1,20 @@
 import libry as ry
 import numpy as np
 import time
+from transitions import State
+from functools import partial
 
 from scipy.io.matlab.mio5_params import mat_struct
 
 
-class Primitive:
+class Primitive(State):
 
-    def __init__(self, C, S, tau, start, n_steps, gripper, goal="goal",
+    def __init__(self, name, C, S, tau, n_steps, gripper, goal="goal",
                  V=None, grasping=False, holding=False, releasing=False):
 
+        State.__init__(self, name, on_enter="init_state")
         self.gripper = gripper
         self.goal = goal
-        self.start = start
         self.duration = tau * n_steps
         self.n_steps = n_steps
         self.tau = tau
@@ -23,15 +25,20 @@ class Primitive:
         self.holding = holding
         self.releasing = releasing
         self.initial_goal_position = self.C.frame(self.goal).getPosition()
-        # generate komo with specific primitive
-        self.komo = self._get_komo()
 
-    def _get_komo(self):
+        # t_start and komo need initialized in the init() function
+        self.t_start = None
+        self.komo = None
+
+    def create_komo(self, t):
         print(" method is not implemented!!")
         return None
 
+    def is_grasping(self):
+        return self.S.getGripperIsGrasping(self.gripper)
+
     def is_done_cond(self, t):
-        i = t - self.start
+        i = t - self.t_start
         if self.grasping:
             if i < self.n_steps or not self.S.getGripperIsGrasping(self.gripper):
                 return False
@@ -55,7 +62,7 @@ class Primitive:
             return False
 
     def step(self, t, goal_current=None):
-        i = t - self.start
+        i = t - self.t_start
         if i < self.n_steps:
             self.C.setFrameState(self.komo.getConfiguration(i))
             q = self.C.getJointState()
@@ -66,16 +73,49 @@ class Primitive:
             q[-1] = self.S.getGripperWidth(self.gripper)
             self.C.setJointState(q)
             self.S.step([], self.tau, ry.ControlMode.none)
-            
+
+
+class GravComp(Primitive):
+    """
+    Special class for holding the current position, waiting for an event to happen
+    """
+
+    def __init__(self, C, S, tau, n_steps, gripper, goal="goal", V=None):
+        Primitive.__init__(self, "grav_comp", C, S, tau, n_steps, gripper, goal, V,
+                           grasping=False, holding=False, releasing=False)
+
+
+    def create_komo(self, t):
+        """
+        Dont need a komo if nothing is happening
+        :return:
+        """
+        return
+
+    def step(self, t, goal_current=None):
+        """
+        Also do nothing here
+        """
+        self.S.step([], self.tau, ry.ControlMode.none)
+        return
+
+    def is_done_cond(self, t):
+        """
+        This primitive waits until another condition has been
+        :param t:
+        :return:
+        """
+        False
+
 
 class TopGrasp(Primitive):
 
-    def __init__(self, C, S, tau, t_start, n_steps, gripper, goal="goal", V=None):
-        Primitive.__init__(self, C, S, tau, t_start, n_steps, gripper, goal, V,
+    def __init__(self, C, S, tau, n_steps, gripper, goal="goal", V=None):
+        Primitive.__init__(self, "top_grasp", C, S, tau, n_steps, gripper, goal, V,
                            grasping=True, holding=False, releasing=False)
         
-    def _get_komo(self):
-        
+    def create_komo(self, t_start):
+        self.t_start = t_start
         start_config = self.C.getFrameState()
         iK = self.C.komo_IK(False)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[self.goal, self.gripper], target=[0.0, 0.0, -0.07],
@@ -118,16 +158,18 @@ class TopGrasp(Primitive):
         time.sleep(2)
         V2.playVideo()
         time.sleep(2)
+        self.komo = komo
         return komo
 
 
 class SideGrasp(Primitive):
 
-    def __init__(self, C, S, tau, t_start, n_steps, gripper, goal="goal", V=None):
-        Primitive.__init__(self, C, S, tau, t_start, n_steps, gripper, goal, V,
+    def __init__(self, C, S, tau, n_steps, gripper="R_gripper", goal="goal", V=None):
+        Primitive.__init__(self,"side_grasp", C, S, tau, n_steps, gripper, goal, V,
                            grasping=True, holding=False, releasing=False)
 
-    def _get_komo(self):
+    def create_komo(self, t_start):
+        self.t_start = t_start
         start_config = self.C.getFrameState()
 
         # generate self.goal configuration
@@ -159,16 +201,18 @@ class SideGrasp(Primitive):
                           target=[-1], scale=[1e3])
         komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper], scale=[1e3])
         komo.optimize()
-        return komo
+        self.komo = komo
+        return
 
 
 class LiftUp(Primitive):
     
-    def __init__(self, C, S, tau, t_start, n_steps, gripper, goal="goal", V=None):
-        Primitive.__init__(self, C, S, tau, t_start, n_steps, gripper, goal, V,
+    def __init__(self, C, S, tau, n_steps, gripper, goal="goal", V=None):
+        Primitive.__init__(self,"lift_up", C, S, tau, n_steps, gripper, goal, V,
                            grasping=False, holding=True, releasing=False)
         
-    def _get_komo(self):
+    def create_komo(self, t_start):
+        self.t_start = t_start
         start_config = self.C.getFrameState()
         iK = self.C.komo_IK(False)
 
@@ -201,6 +245,7 @@ class LiftUp(Primitive):
         komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=goal_joint_config, scale=[1e2] * 16)
         komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e1])
         komo.optimize()
+        self.komo = komo
         return komo
         
 
@@ -275,4 +320,5 @@ def side_grasp(C, n_steps, duration, gripper, goal, V, hold=False):
                       target=[-1], scale=[1e3])
     komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[gripper, goal], scale=[1e3])
     komo.optimize()
+    self.komo = komo
     return komo

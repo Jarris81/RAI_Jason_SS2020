@@ -1,1 +1,4 @@
-.idea
+.idea/*
+util/__pycache__/*
+*.global
+

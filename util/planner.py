@@ -6,8 +6,6 @@ def check_if_goal_constant(goals, minumum_goals=2, tolerance=0.005):
     if len(goals) < minumum_goals:
         return False
     checker = goals[0]
-    print("checker", checker)
-    print("goal1", goals[1])
     for goal in goals:
         if goal.shape[0] != checker.shape[0] or goal.shape[1] != checker.shape[1]:
             return False
@@ -20,7 +18,6 @@ def check_if_goal_constant(goals, minumum_goals=2, tolerance=0.005):
 
 
 def set_goal_ball(C, V, position, radius):
-    print("setting new goal")
     goal = C.frame("goal")
     goal.setShape(ry.ST.sphere, [radius+0.005])
     goal.setColor([0, 1, 0])
