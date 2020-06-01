@@ -2,7 +2,7 @@ import libry as ry
 import util.perception as perc
 from os.path import join
 
-pathRepo = '/home/jason/git/robotics-course/'
+pathRepo = '/home/nika/git/robotics-course'
 
 
 def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=False):
