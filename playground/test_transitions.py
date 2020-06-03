@@ -12,7 +12,8 @@ import util.primitive as grasp
 import util.transformations as _tf
 from util.planner import set_goal_ball
 import util.primitive as prim
-from util.robots import Panda
+from util.behavior import GrabAndLift
+from util.behavior import PickAndPlace
 from transitions import Machine
 from functools import partial
 
@@ -35,13 +36,13 @@ if __name__ == "__main__":
 
     hasGoal = False
 
-    panda = Panda(C, S, tau)
+    panda = PickAndPlace(C, S, V, tau)
 
     for t in range(1000):
         time.sleep(tau)
 
         # frame rate of camera, do perception here
-        if t % rate_camera == 0:
+        if t % rate_camera == 0 and not hasGoal:
             frame = S.getImageAndDepth()  # we don't need images with 100Hz, rendering is slow
             goal = perc.get_red_ball_contours(frame, back_frame, cameraFrame, fxfypxpy, vis=True)
             if len(goal):
@@ -54,12 +55,10 @@ if __name__ == "__main__":
                 goal_pos = goals[-1][goal_arg]
                 set_goal_ball(C, V, goal_pos, 0.03)
                 panda.set_Goal(True)
+                # only need one goal
+                hasGoal = True
 
         panda.step(t)
-        # #side_grasp.step(t)
-        # print(panda.state)
-        # #panda.to_lift_up(t)
-        # panda.done()
-        # print(panda.state)
-        # panda.step(t)
 
+
+    time.sleep(5)

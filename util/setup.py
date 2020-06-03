@@ -23,19 +23,19 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
 
     if add_red_ball:
         # only add 1 red ball
-        number_objects = 2
+        number_objects = 1
         # you can also change the shape & size
         R.getFrame("obj0").setColor([1., 0, 0])
-        R.getFrame("obj0").setShape(ry.ST.sphere, [.03])
+        R.getFrame("obj0").setShape(ry.ST.sphere, [0.03])
         # RealWorld.getFrame("obj0").setShape(ry.ST.ssBox, [.05, .05, .2, .01])
-        R.getFrame("obj0").setPosition([0.0, .05, 2.])
+        R.getFrame("obj0").setPosition([0.0, -.02, 0.68])
         R.getFrame("obj0").setContact(1)
 
-        R.getFrame("obj1").setColor([0, 0, 1.])
-        R.getFrame("obj1").setShape(ry.ST.sphere, [.03])
-        # RealWorld.getFrame("obj0").setShape(ry.ST.ssBox, [.05, .05, .2, .01])
-        R.getFrame("obj1").setPosition([0.0, .3, 2.])
-        R.getFrame("obj1").setContact(1)
+        # R.getFrame("obj1").setColor([0, 0, 1.])
+        # R.getFrame("obj1").setShape(ry.ST.sphere, [.03])
+        # # RealWorld.getFrame("obj0").setShape(ry.ST.ssBox, [.05, .05, .2, .01])
+        # R.getFrame("obj1").setPosition([0.0, .3, 2.])
+        # R.getFrame("obj1").setContact(1)
 
     for o in range(number_objects, 30):
         name = "obj%i" % o
@@ -51,6 +51,8 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
     C.addFile(join(pathRepo, "scenarios/pandasTable.g"))
     V = ry.ConfigurationViewer()
     V.setConfiguration(C)
+
+    # add goal without setting position, sha
     C.addFrame("goal")
 
     return R, S, C, V, back_frame
