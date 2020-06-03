@@ -18,7 +18,7 @@ def setup():
     # add box
     box = C.addFrame("goal")
     side = 0.08
-    #box.setShape(ry.ST.ssBox, size=[side, side, side, .02])
+    box.setShape(ry.ST.ssBox, size=[side, side, side, .02])
     box.setColor([.5, 1, 1])
     box.setPosition([0, .05, 0.68])
 

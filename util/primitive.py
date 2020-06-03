@@ -32,7 +32,7 @@ class Primitive(State):
         self.mask_gripper[-1] = 1
         self.mask_gripper[7] = 1
 
-        # t_start and komo need initialized in the init() function
+        # these attribute need to be set in the method create_primitive
         self.t_start = None
         self.start_config = None
         self.goal_config = None
@@ -196,19 +196,15 @@ class TopPlace(Primitive):
                            grasping=False, holding=False, placing=True, vis=vis)
 
     def _get_goal_config(self, move_to=None):
-        # get gripper and goal object positions
-        #gripper_pos = np.asarray(self.C.frame(self.gripper).info()["X"])[:3]
-        #goal_pos = np.asarray(self.C.frame(self.goal).info()["X"])[:3]
-        # we only care about difference in z-axis
-        #dist_to_ground = (gripper_pos - goal_pos)[2]
-        # adjust where we need to move the gripper
-        #move_to[2] = move_to[2] + dist_to_ground
         # get current joint state
         q = self.C.getJointState()
         iK = self.C.komo_IK(False)
         iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=q, scale=self.mask_gripper)
+        # we assume the object is attached to the frame of the gripper, therefore we can simply just
+        # tell the goal object should have a position
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.position,
                         frames=[self.goal], scale=[1] * 3, target=move_to)
+        # z-axis of gripper should align in z-axis of world frame
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorZ, frames=[self.gripper], target=[0, 0, 1])
         # no contact
         iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions)
@@ -231,10 +227,7 @@ class SideGrasp(Primitive):
         Primitive.__init__(self, "side_grasp", C, S, V, tau, n_steps, gripper, goal,
                            grasping=True, holding=False, placing=False, vis=vis)
 
-    def create_primitive(self, t_start, move_to=None):
-        self.t_start = t_start
-        start_config = self.C.getFrameState()
-
+    def _get_goal_config(self, move_to=None):
         # generate self.goal configuration
         iK = self.C.komo_IK(False)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[self.goal, self.gripper], target=[0.0, 0.0, -0.07])
@@ -244,18 +237,9 @@ class SideGrasp(Primitive):
         # no contact
         iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions)
         iK.optimize()
-        self.goal_config = iK.getConfiguration(0)
+        return iK.getConfiguration(0)
 
-        # set config to get joint config
-        self.C.setFrameState(self.goal_config)
-        if self.V:
-            print("Displaying Side Grasp Config")
-            self.V.setConfiguration(self.C)
-            time.sleep(2)
-        self.goal_joint_config = self.C.getJointState()
-        self.C.setFrameState(start_config)
-
-        # generate motion
+    def _get_komo(self, move_to=None):
         komo = self.C.komo_path(1, self.n_steps, self.duration, True)
         komo.addObjective(time=[0.8, 1.], type=ry.OT.eq, feature=ry.FS.qItself, scale=[1e3] * 16, order=2)
         komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=self.goal_joint_config, scale=[1] * 16)
@@ -264,8 +248,7 @@ class SideGrasp(Primitive):
                           target=[-1], scale=[1e3])
         komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper], scale=[1e3])
         komo.optimize()
-        self.komo = komo
-        return
+        return komo
 
 
 class LiftUp(Primitive):
@@ -274,40 +257,26 @@ class LiftUp(Primitive):
         Primitive.__init__(self,"lift_up", C, S, V, tau, n_steps, gripper, goal,
                            grasping=False, holding=True, placing=False, vis=vis)
         
-    def create_primitive(self, t_start, move_to=None):
-        self.t_start = t_start
-        start_config = self.C.getFrameState()
+    def _get_goal_config(self, move_to=None):
         iK = self.C.komo_IK(False)
-
         # get new position
         goal_position = self.C.frame(self.gripper).getPosition()
         goal_position[2] = goal_position[2] + 1.0
         q = self.C.getJointState()
-        # print(q)
-        mask_gripper = [0] * 16
-        # mask_self.gripper[-1] = 1
-        # mask_self.gripper[7] = 1
-        iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=q, scale=mask_gripper)
+        iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=q, scale=self.mask_gripper)
         iK.addObjective(type=ry.OT.sos, feature=ry.FS.position,
                         frames=[self.gripper], scale=[1] * 3, target=goal_position)
         # no contact
         iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions)
         iK.optimize()
 
-        goal_config = iK.getConfiguration(0)
-        # set config to get joint config
-        self.C.setFrameState(goal_config)
-        if self.V:
-            print("Displaying Lift-Up   Config")
-            self.V.setConfiguration(self.C)
-            time.sleep(2)
-        goal_joint_config = self.C.getJointState()
-        self.C.setFrameState(start_config)
+        return iK.getConfiguration(0)
+
+    def _get_komo(self, move_to=None):
         komo = self.C.komo_path(1, self.n_steps, self.duration, True)
         komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e1] * 16, order=2)
-        komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=goal_joint_config, scale=[1e2] * 16)
+        komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=self.goal_joint_config, scale=[1e2] * 16)
         komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e1])
         komo.optimize()
-        self.komo = komo
         return komo
 

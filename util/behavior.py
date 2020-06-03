@@ -5,11 +5,11 @@ from functools import partial
 
 class GrabAndLift:
 
-    def __init__(self, C, S, tau, V=None):
+    def __init__(self, C, S, V, tau):
         # add all states
-        self.grav_comp = prim.GravComp(C, S, tau, 1000, gripper="R_gripper", V=V)
-        self.side_grasp = prim.SideGrasp(C, S, tau, 100, gripper="R_gripper", V=V)
-        self.lift_up = prim.LiftUp(C, S, tau, 100, gripper="R_gripper", V=V)
+        self.grav_comp = prim.GravComp(C, S, V, tau, 1000, gripper="R_gripper")
+        self.side_grasp = prim.SideGrasp(C, S, V, tau, 100, gripper="R_gripper")
+        self.lift_up = prim.LiftUp(C, S, V, tau, 100, gripper="R_gripper")
         self.name = "Panda"
         self.state = None
         self.t = 0

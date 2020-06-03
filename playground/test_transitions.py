@@ -19,6 +19,10 @@ from functools import partial
 
 pathRepo = '/home/jason/git/robotics-course/'
 
+"""
+Short example for testing the transition library, 
+and building a state machine for the different primitives
+"""
 
 if __name__ == "__main__":
 

@@ -18,9 +18,6 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
     R = ry.Config()
     R.addFile(join(pathRepo, "scenarios/challenge.g"))
 
-    # Change color of objects
-    S.addSensor("camera")
-
     if add_red_ball:
         # only add 1 red ball
         number_objects = 1
@@ -42,21 +39,62 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
         print("deleting", name)
         R.delFrame(name)
 
+    C, S, V = _get_CSV(R)
+
+    return R, S, C, V, back_frame
+
+
+def setup_env_subgoal_1(show_background=False):
+    num_blocks = 2
+    R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+
+    side = 0.08
+    positions =[
+        [0.0, -.2, 0.65+side/2],
+        [-0.1, 0, 0.65+side/2],
+        #[0.0, -.2, 0.65+side/2],
+        #[-0.1, 0, 0.65+side/2],
+        #[0.1, 0, 0.65+side/2],
+    ]
+    for o in range(num_blocks):
+        name = "obj%i" % o
+        box = R.frame(name)
+        box.setPosition(positions[o])
+        box.setColor([1, 0, 0])
+        box.setShape(ry.ST.ssBox, size=[side, side, side, 0.001])
+        box.setQuaternion([1, 0, 0, 0])
+
+    C, S, V = _get_CSV(R)
+
+    return R, S, C, V, back_frame
+
+
+def setup_env_test_edge_grasp(show_background=False):
+    num_blocks = 1
+    R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+
+    height = 0.08
+    width = 0.3
+    length = width
+    position = [.5, 0.0, 0.65+height/2]
+    box = R.frame("obj0")
+    box.setPosition(position)
+    box.setColor([1, 0, 0])
+    box.setShape(ry.ST.ssBox, size=[length, width, height, 0.001])
+    box.setQuaternion([1, 0, 0, 0])
+
+    C, S, V = _get_CSV(R)
+
+    return R, S, C, V, back_frame
+
+def _get_CSV(R):
     S = R.simulation(ry.SimulatorEngine.physx, True)
-
-    # Change color of objects
     S.addSensor("camera")
-
     C = ry.Config()
     C.addFile(join(pathRepo, "scenarios/pandasTable.g"))
     V = ry.ConfigurationViewer()
     V.setConfiguration(C)
-
-    # add goal without setting position, sha
-    C.addFrame("goal")
-
-    return R, S, C, V, back_frame
-
+    return C, S, V
 
 def setup_camera(C):
     # setup camera
