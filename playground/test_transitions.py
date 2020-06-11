@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # setup env and get background
     R, S, C, V, back_frame = setup_challenge_env(True, 0, show_background=False)
     cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
-
+    C.addFrame("goal")
     tau = .01
     rate_camera = 10
 

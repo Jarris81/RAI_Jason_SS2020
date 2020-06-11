@@ -4,6 +4,7 @@ import libry as ry
 from util.setup import setup_challenge_env
 from util.setup import setup_camera
 from util.setup import setup_env_test_edge_grasp
+from util.transformations import quaternion_from_matrix
 import util.perception as perc
 import util.geom as geom
 import numpy as np
@@ -18,6 +19,11 @@ from util.behavior import PickAndPlace
 from transitions import Machine
 from functools import partial
 
+def cheat_update_goal(goal):
+    goal.setPosition(S.getGroundTruthPosition("obj0"))
+    goal.setShape(ry.ST.ssBox, size=S.getGroundTruthSize("obj0"))
+    goal.setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix("obj0")))
+
 if __name__ == "__main__":
 
     # setup env and get background
@@ -25,12 +31,21 @@ if __name__ == "__main__":
     cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
 
     tau = .01
-    rate_camera = 10
+    # add goal to config
+    goal = C.addFrame("goal")
+    goal.setContact(1)
 
-    state = 0
+    # cheat and set goal in config from simulation
+    cheat_update_goal(goal)
+    V.setConfiguration(C)
 
-    hasGoal = False
+    align_push = prim.AlignPush(C, S, V, tau, 100, gripper="R_gripper", vis=True)
+    align_push.create_primitive(0)
+    for t in range(200):
 
-    #panda = PickAndPlace(C, S, V, tau)
+        align_push.step(t)
 
     time.sleep(10)
+
+
+

@@ -98,7 +98,7 @@ class Primitive(State):
         else:
             return False
 
-    def step(self, t, goal_current=None):
+    def step(self, t):
         i = t - self.t_start
         if i < self.n_steps:
             self.C.setFrameState(self.komo.getConfiguration(i))
@@ -139,7 +139,7 @@ class GravComp(Primitive):
         """
         return
 
-    def step(self, t, goal_current=None):
+    def step(self, t):
         """
         Also do nothing here
         """
@@ -280,3 +280,39 @@ class LiftUp(Primitive):
         komo.optimize()
         return komo
 
+
+class AlignPush(Primitive):
+
+    def __init__(self, C, S, V, tau, n_steps, gripper, goal="goal", vis=False):
+        Primitive.__init__(self, "align_push", C, S, V, tau, n_steps, gripper, goal,
+                           grasping=False, holding=False, placing=False, vis=vis)
+
+    def _get_goal_config(self, move_to=None):
+        iK = self.C.komo_IK(False)
+        # get new position
+        q = self.C.getJointState()
+        #iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=q, scale=self.mask_gripper)
+        iK.addObjective(type=ry.OT.sos, feature=ry.FS.positionRel, frames=[self.gripper, self.goal],
+                        target=[-0.15, 0, 0.01], scale=[1]*3)
+        iK.addObjective(type=ry.OT.sos, feature=ry.FS.positionDiff, frames=[self.gripper, self.goal],
+                        scale=[0, 0, 1])
+        iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorZ, frames=[self.gripper], target=[0, 0, 1])
+        iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductXY, frames=[self.gripper, self.goal], target=[1],
+                        scale=[1])
+        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper],
+                          scale=[1e3])
+        # no contact
+        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions)
+        iK.optimize()
+
+        return iK.getConfiguration(0)
+
+    def _get_komo(self, move_to=None):
+        komo = self.C.komo_path(1, self.n_steps, self.duration, True)
+        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e1] * 16, order=2)
+        komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.jointLimits)
+        komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=self.goal_joint_config,
+                          scale=[1e2] * 16)
+        komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1])
+        komo.optimize()
+        return komo
