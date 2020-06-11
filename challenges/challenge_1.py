@@ -1,7 +1,7 @@
 import sys
 import cv2 as cv
 import libry as ry
-from util.setup import setup_challenge_env
+from util.setup import setup_env_subgoal_1
 from util.setup import setup_camera
 import util.perception as perc
 import util.geom as geom
@@ -16,6 +16,7 @@ from util.behavior import GrabAndLift
 from util.behavior import PickAndPlace
 from transitions import Machine
 from functools import partial
+from util.transformations import quaternion_from_matrix
 
 pathRepo = '/home/jason/git/robotics-course/'
 
@@ -24,17 +25,22 @@ Short example for testing the transition library,
 and building a state machine for the different primitives
 """
 
+def cheat_update_obj(obj):
+    C.addFrame(obj)
+    C.frame(obj).setPosition(S.getGroundTruthPosition(obj))
+    C.frame(obj).setShape(ry.ST.ssBox, size=S.getGroundTruthSize(obj))
+    C.frame(obj).setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix(obj)))
+    C.frame(obj).setColor([1, 0, 0])
+    C.frame(obj).setContact(1)
+
+
 if __name__ == "__main__":
 
     # setup env and get background
-    R, S, C, V, back_frame = setup_challenge_env(True, 0, show_background=False)
+    R, S, C, V, back_frame = setup_env_subgoal_1(False)
     cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
-    C.addFrame("goal")
     tau = .01
     rate_camera = 10
-
-    goals = []
-    goals_stored = 3
 
     state = 0
 
@@ -46,23 +52,12 @@ if __name__ == "__main__":
         time.sleep(tau)
 
         # frame rate of camera, do perception here
-        if t % rate_camera == 0 and not hasGoal:
-            frame = S.getImageAndDepth()  # we don't need images with 100Hz, rendering is slow
-            goal = perc.get_red_ball_contours(frame, back_frame, cameraFrame, fxfypxpy, vis=True)
-            if len(goal):
-                goals.append(goal)
-            if len(goals) > goals_stored:
-                goals.pop(0)
-            if check_if_goal_constant(goals, tolerance=0.5):
-                # get the closest ball and set as goal
-                goal_arg = geom.closest_point(C.frame("R_gripper").getPosition(), goals[-1])
-                goal_pos = goals[-1][goal_arg]
-                set_goal_ball(C, V, goal_pos, 0.03)
-                panda.set_blocks(["goal"])
-                # only need one goal
-                hasGoal = True
+        if t > 200 and not hasGoal:
+            cheat_update_obj("obj0")
+            cheat_update_obj("obj1")
+            panda.set_blocks(["obj0", "obj1"])
+            hasGoal = True
 
         panda.step(t)
-
 
     time.sleep(5)

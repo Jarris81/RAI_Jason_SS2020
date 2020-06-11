@@ -9,12 +9,10 @@ from scipy.io.matlab.mio5_params import mat_struct
 
 class Primitive(State):
 
-    def __init__(self, name, C, S, V, tau, n_steps, gripper, goal="goal",
+    def __init__(self, name, C, S, V, tau, n_steps,
                  grasping=False, holding=False, placing=False, vis=False):
 
         State.__init__(self, name, on_enter="init_state")
-        self.gripper = gripper
-        self.goal = goal
         self.duration = tau * n_steps
         self.n_steps = n_steps
         self.tau = tau
@@ -24,7 +22,6 @@ class Primitive(State):
         self.grasping = grasping
         self.holding = holding
         self.placing = placing
-        self.initial_goal_position = self.C.frame(self.goal).getPosition()
         self.vis = vis
 
         # mask to make sure the fingers do not change
@@ -33,16 +30,22 @@ class Primitive(State):
         self.mask_gripper[7] = 1
 
         # these attribute need to be set in the method create_primitive
+        self.gripper = None
+        self.goal = None
         self.t_start = None
         self.start_config = None
         self.goal_config = None
+        self.initial_goal_position = None
         self.goal_joint_config = None
         self.iK = None
         self.komo = None
 
-    def create_primitive(self, t_start, move_to=None):
+    def create_primitive(self, t_start, gripper, goal, move_to=None):
         self.t_start = t_start
+        self.gripper = gripper
+        self.goal = goal
         self.start_config = self.C.getFrameState()
+        self.initial_goal_position = self.C.frame(self.goal).getPosition()
         # get the goal configuration
         self.goal_config = self._get_goal_config(move_to)
         self.C.setFrameState(self.goal_config)
@@ -128,11 +131,11 @@ class GravComp(Primitive):
     Special class for holding the current position, waiting for an event to happen
     """
 
-    def __init__(self, C, S, V, tau, n_steps, gripper, goal="goal", vis=False):
-        Primitive.__init__(self, "grav_comp", C, S, V, tau, n_steps, gripper, goal,
+    def __init__(self, C, S, V, tau, n_steps, vis=False):
+        Primitive.__init__(self, "grav_comp", C, S, V, tau, n_steps,
                            grasping=False, holding=False, placing=False, vis=vis)
 
-    def create_primitive(self, t_start, move_to=None):
+    def create_primitive(self, t_start, gripper, goal, move_to=None):
         """
         Dont need a komo if nothing is happening
         :return:
@@ -144,6 +147,7 @@ class GravComp(Primitive):
         Also do nothing here
         """
         self.S.step([], self.tau, ry.ControlMode.none)
+        self.V.setConfiguration(self.C)
         return
 
     def is_done_cond(self, t):
@@ -155,8 +159,8 @@ class GravComp(Primitive):
 
 class TopGrasp(Primitive):
 
-    def __init__(self, C, S, V,tau, n_steps, gripper, goal="goal", vis=False):
-        Primitive.__init__(self, "top_grasp", C, S, V, tau, n_steps, gripper, goal,
+    def __init__(self, C, S, V,tau, n_steps, vis=False):
+        Primitive.__init__(self, "top_grasp", C, S, V, tau, n_steps,
                            grasping=True, holding=False, placing=False, vis=vis)
         
     def _get_goal_config(self, move_to=None):
@@ -191,8 +195,8 @@ class TopGrasp(Primitive):
 
 class TopPlace(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, gripper="R_gripper", goal="goal", vis=False):
-        Primitive.__init__(self, __name__, C, S, V, tau, n_steps, gripper, goal,
+    def __init__(self, C, S, V, tau, n_steps, vis=False):
+        Primitive.__init__(self, __name__, C, S, V, tau, n_steps,
                            grasping=False, holding=False, placing=True, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -223,8 +227,8 @@ class TopPlace(Primitive):
 
 class SideGrasp(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, gripper="R_gripper", goal="goal", vis=False):
-        Primitive.__init__(self, "side_grasp", C, S, V, tau, n_steps, gripper, goal,
+    def __init__(self, C, S, V, tau, n_steps, vis=False):
+        Primitive.__init__(self, "side_grasp", C, S, V, tau, n_steps,
                            grasping=True, holding=False, placing=False, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -253,8 +257,8 @@ class SideGrasp(Primitive):
 
 class LiftUp(Primitive):
     
-    def __init__(self, C, S, V, tau, n_steps, gripper, goal="goal", vis=False):
-        Primitive.__init__(self,"lift_up", C, S, V, tau, n_steps, gripper, goal,
+    def __init__(self, C, S, V, tau, n_steps, vis=False):
+        Primitive.__init__(self,"lift_up", C, S, V, tau, n_steps,
                            grasping=False, holding=True, placing=False, vis=vis)
         
     def _get_goal_config(self, move_to=None):
@@ -283,8 +287,8 @@ class LiftUp(Primitive):
 
 class AlignPush(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, gripper, goal="goal", vis=False):
-        Primitive.__init__(self, "align_push", C, S, V, tau, n_steps, gripper, goal,
+    def __init__(self, C, S, V, tau, n_steps, vis=False):
+        Primitive.__init__(self, "align_push", C, S, V, tau, n_steps,
                            grasping=False, holding=False, placing=False, vis=vis)
 
     def _get_goal_config(self, move_to=None):

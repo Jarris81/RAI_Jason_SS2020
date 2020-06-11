@@ -1,5 +1,8 @@
 import util.primitive as prim
 from transitions import Machine
+from util.tower import Tower
+import libry as ry
+import copy
 from functools import partial
 
 
@@ -59,15 +62,19 @@ class PickAndPlace:
 
     def __init__(self, C, S, V, tau):
         # add all states
-        self.grav_comp = prim.GravComp(C, S, V, tau, 1000, gripper="R_gripper", vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 100, gripper="R_gripper", vis=False)
-        self.top_place = prim.TopPlace(C, S, V, tau, 100, gripper="R_gripper", vis=False)
+        self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 100,  vis=False)
+        self.top_place = prim.TopPlace(C, S, V, tau, 100,  vis=False)
         self.name = "Panda"
         self.state = None
         self.t = 0
-        self.hasGoal = False
+        self.goal = None
 
-        self.tower_position = [0.0, 0.3, .68]
+        self.C = C
+        self.V = V
+        self.observed_blocks = []
+
+        self.tower = Tower(C, [0.3, 0.0, .68])
 
         # define list of states
         self.states = [self.top_grasp, self.top_place, self.grav_comp]
@@ -75,19 +82,15 @@ class PickAndPlace:
         # create finite state machine
         self.fsm = Machine(model=self, states=self.states, initial=self.grav_comp, auto_transitions=False)
         # add all transitions
-        self.fsm.add_transition("do_top_grasp", source=self.grav_comp, dest=self.top_grasp, conditions="get_has_goal")
+        self.fsm.add_transition("do_top_grasp", source=self.grav_comp, dest=self.top_grasp, conditions=self._has_Goal)
         self.fsm.add_transition("is_done", source=self.top_grasp, dest=self.top_place, conditions=self._is_grasping)
-        self.fsm.add_transition("is_done", source=self.top_place, dest=self.grav_comp, conditions=self._is_open)
+        self.fsm.add_transition("is_done", source=self.top_place, dest=self.grav_comp, conditions=self._is_open, before=self.place_goal_in_tower)
         self.init_state()
 
         self.cheat = True
 
-    # def on_enter_lift_up(self):
-    #      self.lift_up.get_komo()
-    #      print(self.state)
-
     def init_state(self):
-        self.fsm.get_state(self.state).create_primitive(self.t, move_to=self.tower_position)
+        self.fsm.get_state(self.state).create_primitive(self.t, gripper="R_gripper", goal=self.goal, move_to=self.tower.get_placement())
 
     def step(self, t):
         self.t = t
@@ -107,8 +110,54 @@ class PickAndPlace:
     def _is_open(self):
         return self.fsm.get_state(self.state).is_open()
 
-    def set_Goal(self, hasGoal):
-        self.hasGoal = hasGoal
+    def _has_Goal(self):
+        """
+        This function should define the next block, which should be placed in the tower
+        :param hasGoal:
+        :return:
+        """
 
-    def get_has_goal(self):
-        return self.hasGoal
+        # get all the blocks which are not in tower
+        unplaced_blocks = [block for block in self.observed_blocks if block not in self.tower.get_blocks()]
+        # return false if no block available to place
+        if not len(unplaced_blocks):
+            return False
+
+        # would have to sort and filter blocks somehow, according to size, distance etc
+        sorted_filtered_blocks = unplaced_blocks
+
+        if not len(sorted_filtered_blocks):
+            return False
+        # get the first in list
+        self.goal = sorted_filtered_blocks[0]
+        print(f"New Goal is : {self.goal}!")
+        self.C.frame(self.goal).setColor([0, 1, 0])
+        self.V.recopyMeshes(self.C)
+        return True
+
+    def place_goal_in_tower(self):
+        print(f"Block {self.goal} was placed!!!")
+        self.C.frame(self.goal).setColor([0, 0, 1])
+        self.V.recopyMeshes(self.C)
+        self.tower.add_block(self.goal)
+        self.goal = None
+
+    def set_blocks(self, blocks):
+
+        self.observed_blocks = blocks
+
+
+def change_color_obj(C, V,  obj, new_color):
+    frame = C.frame(obj)
+    pos = frame.getPosition()
+    quat = frame.getQuaternion()
+    size = frame.info()["size"]
+    C.delFrame(obj)
+
+    obj = "obj2"
+    C.addFrame(obj)
+    C.frame(obj).setPosition(pos)
+    C.frame(obj).setShape(ry.ST.ssBox, size=size)
+    C.frame(obj).setQuaternion(quat)
+    C.frame(obj).setColor([1, 0, 1])
+    V.setConfiguration(C)

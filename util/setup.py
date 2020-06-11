@@ -36,7 +36,6 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
 
     for o in range(number_objects, 30):
         name = "obj%i" % o
-        print("deleting", name)
         R.delFrame(name)
 
     C, S, V = _get_CSV(R)
@@ -63,6 +62,7 @@ def setup_env_subgoal_1(show_background=False):
         box.setColor([1, 0, 0])
         box.setShape(ry.ST.ssBox, size=[side, side, side, 0.001])
         box.setQuaternion([1, 0, 0, 0])
+        box.setContact(1)
 
     C, S, V = _get_CSV(R)
 
@@ -87,6 +87,7 @@ def setup_env_test_edge_grasp(show_background=False):
 
     return R, S, C, V, back_frame
 
+
 def _get_CSV(R):
     S = R.simulation(ry.SimulatorEngine.physx, True)
     S.addSensor("camera")
@@ -95,6 +96,7 @@ def _get_CSV(R):
     V = ry.ConfigurationViewer()
     V.setConfiguration(C)
     return C, S, V
+
 
 def setup_camera(C):
     # setup camera
