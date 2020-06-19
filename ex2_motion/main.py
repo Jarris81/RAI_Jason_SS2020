@@ -1,10 +1,9 @@
-import sys
 from os.path import join
 import libry as ry
 import numpy as np
 import time
 
-from ex2_motion.bezier import create_bezier
+from util.bezier import create_bezier
 
 pathRepo = '../../git/robotics-course/'
 

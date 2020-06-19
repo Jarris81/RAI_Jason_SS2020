@@ -1,21 +1,10 @@
-import sys
-import cv2 as cv
-import libry as ry
-from util.setup import setup_env_subgoal_1
-from util.setup import setup_camera
-import util.perception as perc
-import util.geom as geom
-import numpy as np
 import time
-from util.planner import check_if_goal_constant
-import util.primitive as grasp
-import util.transformations as _tf
-from util.planner import set_goal_ball
-import util.primitive as prim
-from util.behavior import GrabAndLift
+
+import libry as ry
+
 from util.behavior import PickAndPlace
-from transitions import Machine
-from functools import partial
+from util.setup import setup_camera
+from util.setup import setup_env_subgoal_2
 from util.transformations import quaternion_from_matrix
 
 pathRepo = '/home/jason/git/robotics-course/'
@@ -32,12 +21,13 @@ def cheat_update_obj(obj):
     C.frame(obj).setShape(ry.ST.ssBox, size=S.getGroundTruthSize(obj))
     C.frame(obj).setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix(obj)))
     C.frame(obj).setContact(1)
+    return obj
 
 
 if __name__ == "__main__":
 
     # setup env and get background
-    R, S, C, V, back_frame = setup_env_subgoal_1(False)
+    R, S, C, V, back_frame = setup_env_subgoal_2(False)
     cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
     tau = .01
     rate_camera = 10
@@ -48,14 +38,16 @@ if __name__ == "__main__":
 
     panda = PickAndPlace(C, S, V, tau)
 
+    # used for shortcutting perception
+    num_blocks = 1
+
     for t in range(1000):
         time.sleep(tau)
 
         # frame rate of camera, do perception here
         if t > 100:
-            cheat_update_obj("obj0")
-            cheat_update_obj("obj1")
-            panda.set_blocks(["obj0", "obj1"])
+            # set blocks in config and add
+            panda.set_blocks([cheat_update_obj("obj%i" % i) for i in reversed(range(num_blocks))])
 
         panda.step(t)
 

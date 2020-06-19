@@ -63,7 +63,7 @@ class PickAndPlace:
     def __init__(self, C, S, V, tau):
         # add all states
         self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 100,  vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 100, interpolation=True, vis=False)
         self.top_place = prim.TopPlace(C, S, V, tau, 100,  vis=False)
         self.name = "Panda"
         self.state = None
@@ -146,18 +146,3 @@ class PickAndPlace:
 
         self.observed_blocks = blocks
 
-
-def change_color_obj(C, V,  obj, new_color):
-    frame = C.frame(obj)
-    pos = frame.getPosition()
-    quat = frame.getQuaternion()
-    size = frame.info()["size"]
-    C.delFrame(obj)
-
-    obj = "obj2"
-    C.addFrame(obj)
-    C.frame(obj).setPosition(pos)
-    C.frame(obj).setShape(ry.ST.ssBox, size=size)
-    C.frame(obj).setQuaternion(quat)
-    C.frame(obj).setColor([1, 0, 1])
-    V.setConfiguration(C)

@@ -68,6 +68,31 @@ def setup_env_subgoal_1(show_background=False):
 
     return R, S, C, V, back_frame
 
+def setup_env_subgoal_2(show_background=False):
+    num_blocks = 1
+    R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+
+    side = 0.11
+    positions =[
+        #[0.3, .3, 0.65+side/2],
+        #[-0.1, 0, 0.65+side/2],
+        #[2.0, -.2, 0.65+side/2],
+        #[0.4, .3, 0.65+side/2],
+        [0.2, -0.1, 0.65+side/2],
+    ]
+    for i, o in enumerate(range(num_blocks)):
+        name = "obj%i" % o
+        box = R.frame(name)
+        box.setPosition(positions[o])
+        box.setColor([1, 0, 0])
+        box.setShape(ry.ST.ssBox, size=[side+i*0.01, side+i*0.01,side+i*0.01, 0.001])
+        box.setQuaternion([1, 0, 0, 0])
+        box.setContact(1)
+
+    C, S, V = _get_CSV(R)
+
+    return R, S, C, V, back_frame
+
 
 def setup_env_test_edge_grasp(show_background=False):
     num_blocks = 1
