@@ -63,7 +63,7 @@ class PickAndPlace:
     def __init__(self, C, S, V, tau):
         # add all states
         self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 100, interpolation=True, vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 100, interpolation=False, vis=False)
         self.top_place = prim.TopPlace(C, S, V, tau, 100,  vis=False)
         self.name = "Panda"
         self.state = None

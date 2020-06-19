@@ -77,6 +77,17 @@ class Primitive(State):
                 V2.playVideo()
                 time.sleep(2)
 
+    def _get_q_for_position(self, gripper_position):
+        iK = self.C.komo_IK(False)
+        iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, scale=[5e-1] * 16, order=2)
+        iK.addObjective(type=ry.OT.eq, feature=ry.FS.position, frames=[self.goal, self.gripper],
+                        target=gripper_position, scale=[2e1])
+        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e2])
+        iK.optimize()
+
+        return iK.getConfiguration(0)
+
+
 
     def _get_goal_config(self, move_to=None):
         print("Method: :get_goal_config not implemented for Primtive: ", __name__)
@@ -183,34 +194,46 @@ class TopGrasp(Primitive):
         height_block =self.C.frame(self.goal).getSize()[2]
         iK = self.C.komo_IK(False)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[self.goal, self.gripper],
-                        target=[0.0, 0.0, -(0.01 + height_block/2)], scale=[2e0])
-        iK.addObjective(type=ry.OT.sos, feature=ry.FS.positionDiff, frames=[self.goal, self.gripper], target=[0.0, 0.0, 0.0],
-                        scale=[2])
+                        target=[0.0, 0.0, -(0.01 + height_block/2)], scale=[2e1])
+        #iK.addObjective(type=ry.OT.sos, feature=ry.FS.positionDiff, frames=[self.goal, self.gripper], target=[0.0, 0.0, 0.0],
+        #                scale=[2])
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductZZ, frames=[self.gripper, self.goal], target=[1], scale=[1])
         #iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductXY,
         # frames=[self.gripper, self.goal], target=[1], scale=[1])
         iK.addObjective(type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper])
         # no contact
-        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, )
+        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e2])
         iK.optimize()
 
         return iK.getConfiguration(0)
 
     def _get_komo(self, move_to=None):
         # generate motion
+        # komo = self.C.komo_path(1, self.n_steps, self.duration, True)
+        # komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e-1] * 16, order=2)
+        # komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=self.q_goal,
+        #                   scale=[10] * 16)
+        # komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.accumulatedCollisions, scale=[5e1])
+        # # komo.addObjective(time=[0.9, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductZZ, frames=[self.gripper, self.goal],
+        # #                 target=[1], scale=[1])
+        # # komo.addObjective(time=[0.9, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductXY, frames=[self.gripper, self.goal],
+        # #                 target=[1], scale=[1])
+        # komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper], scale=[1])
         komo = self.C.komo_path(1, self.n_steps, self.duration, True)
-        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e-1] * 16, order=2)
+        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e1] * 16, order=2)
         komo.addObjective(time=[1.], type=ry.OT.eq, feature=ry.FS.qItself, target=self.q_goal,
                           scale=[10] * 16)
-        komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e0])
+        komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e1])
         # komo.addObjective(time=[0.9, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductZZ, frames=[self.gripper, self.goal],
         #                 target=[1], scale=[1])
         # komo.addObjective(time=[0.9, 1.], type=ry.OT.eq, feature=ry.FS.scalarProductXY, frames=[self.gripper, self.goal],
         #                 target=[1], scale=[1])
-        komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper], scale=[1])
+        komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper], scale=[1e2])
         return komo
 
     def _get_joint_interpolation(self):
+        overhead_place = self.C.frame(self.goal).getPosition()
+        overhead_place[2] = overhead_place[2] + 0.4
         # create bezier function
         bezier = beziers.create_bezier("EaseInOutSine")
         # get deltas
