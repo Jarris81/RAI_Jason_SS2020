@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     panda = PickAndPlace(C, S, V, tau)
 
-    for t in range(1000):
+    for t in range(5000):
         time.sleep(tau)
 
         # frame rate of camera, do perception here

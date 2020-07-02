@@ -8,12 +8,13 @@ pathRepo = '/home/jason/git/robotics-course/'
 def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=False):
 
     # -- Add empty REAL WORLD configuration and camera
-    R = ry.Config()
-    R.addFile(join(pathRepo, "scenarios/pandasTable.g"))
-    S = R.simulation(ry.SimulatorEngine.physx, True)
-    S.addSensor("camera")
+    #R = ry.Config()
+    #R.addFile(join(pathRepo, "scenarios/pandasTable.g"))
+    #S = R.simulation(ry.SimulatorEngine.physx, True)
+    #S.addSensor("camera")
 
-    back_frame = perc.extract_background(S, duration=2, vis=show_background)
+    #back_frame = perc.extract_background(S, duration=2, vis=show_background)
+    back_frame = None
 
     R = ry.Config()
     R.addFile(join(pathRepo, "scenarios/challenge.g"))
@@ -47,9 +48,9 @@ def setup_env_subgoal_1(show_background=False):
     num_blocks = 2
     R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
-    side = 0.08
+    side = 0.13
     positions =[
-        [0.0, -.2, 0.65+side/2],
+        [0.3, .3, 0.65+side/2],
         [-0.1, 0, 0.65+side/2],
         #[0.0, -.2, 0.65+side/2],
         #[-0.1, 0, 0.65+side/2],
@@ -69,23 +70,23 @@ def setup_env_subgoal_1(show_background=False):
     return R, S, C, V, back_frame
 
 def setup_env_subgoal_2(show_background=False):
-    num_blocks = 1
+    num_blocks = 5
     R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
-    side = 0.11
+    side = 0.13
     positions =[
-        #[0.3, .3, 0.65+side/2],
-        #[-0.1, 0, 0.65+side/2],
-        #[2.0, -.2, 0.65+side/2],
-        #[0.4, .3, 0.65+side/2],
-        [0.2, -0.1, 0.65+side/2],
+        [0.3, .3, 0.65+side/2],
+        [-0.1, .2, 0.65+side/2],
+        [-0.2, -.1, 0.65+side/2],
+        [0.5, .15, 0.65+side/2],
+        [0.6, 0.3, 0.65+side/2],
     ]
     for i, o in enumerate(range(num_blocks)):
         name = "obj%i" % o
         box = R.frame(name)
         box.setPosition(positions[o])
         box.setColor([1, 0, 0])
-        box.setShape(ry.ST.ssBox, size=[side+i*0.01, side+i*0.01,side+i*0.01, 0.001])
+        box.setShape(ry.ST.ssBox, size=[side-i*0.01, side-i*0.01, side-i*0.01, 0.001])
         box.setQuaternion([1, 0, 0, 0])
         box.setContact(1)
 
@@ -107,6 +108,8 @@ def setup_env_test_edge_grasp(show_background=False):
     box.setColor([1, 0, 0])
     box.setShape(ry.ST.ssBox, size=[length, width, height, 0.001])
     box.setQuaternion([1, 0, 0, 0.2])
+    box.setMass(1e8)
+    box.addAttribute("friction", 1.0)
 
     C, S, V = _get_CSV(R)
 

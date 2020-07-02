@@ -7,6 +7,10 @@ def create_bezier(name):
         return UnitBezier(0.0, 0.0, 1.0, 1.0)
     elif name is "Ease":
         return UnitBezier(0.25, 0.1, 0.25, 1.0)
+    elif name is "EaseInSine":
+        return UnitBezier(0.47, 0, 0.745, 0.715);
+    elif name is "EaseOutSine":
+        return UnitBezier(0.39, 0.575, 0.565, 1);
     elif name is "EaseInOutSine":
         return UnitBezier(0.445, 0.05, 0.55, 0.95)
     elif name is "EaseInOutExpo":

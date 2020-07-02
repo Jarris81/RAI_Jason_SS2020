@@ -2116,6 +2116,7 @@ def depth_data_to_world(pt, fxypxy):
     pt3[2] = -pt[2]
     return pt3
 
+
 def camera_to_world(pt, cameraFrame, fxfypxpy):
     cam_rot = cameraFrame.getRotationMatrix()
     cam_trans = cameraFrame.getPosition()
