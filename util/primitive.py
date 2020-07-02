@@ -164,8 +164,8 @@ class Primitive(State):
             self.S.step([], self.tau, ry.ControlMode.none)
         else:
             print("this condition should really not happen, did you forget to define a transition?")
-        self.V.setConfiguration(self.C)
-        self.V.recopyMeshes(self.C)
+        if not t % 10:
+            self.V.setConfiguration(self.C)
 
 
 class GravComp(Primitive):
