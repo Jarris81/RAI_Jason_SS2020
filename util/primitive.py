@@ -161,7 +161,8 @@ class Primitive(State):
                 self.is_in_world = True
             self.place_counter = self.place_counter + 1
             self.C.setJointState(self.S.get_q())
-            self.S.step([], self.tau, ry.ControlMode.none)
+            for _ in range(10):
+                self.S.step([], self.tau/10, ry.ControlMode.none)
         else:
             print("this condition should really not happen, did you forget to define a transition?")
         if not t % 10:
@@ -362,7 +363,7 @@ class TopPlace(Primitive):
         tower_placment = move_to
         tower_placment[2] = tower_placment[2] + block_size[2]/2
         iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=self.mask_gripper)
-        #iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorX, frames=[self.gripper], target=[0, 1, 0])
+        iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorX, frames=[self.gripper], target=[0, 1, 0])
         # we assume the object is attached to the frame of the gripper, therefore we can simply just
         # tell the goal object should have a position
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.position,

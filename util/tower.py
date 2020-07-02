@@ -11,11 +11,6 @@ class Tower:
 
         self.blocks.append(block)
 
-        # change color to blue of block added to tower
-        #self.C.frame(block)
-        #self.V.setConfiguration(self.C)
-        #self.V.recopyMeshes(self.C)
-
     def get_placement(self):
         placement = list(self.posXY)
         # sum up all blocks height
