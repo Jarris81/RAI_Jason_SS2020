@@ -73,6 +73,7 @@ class PickAndPlace:
         self.state = None
         self.t = 0
         self.goal = None
+        self.gripper = "R_gripper"
 
         self.C = C
         self.V = V
@@ -97,10 +98,12 @@ class PickAndPlace:
 
         self.cheat = True
 
+
+
     def init_state(self):
         print("inting new state")
         print(self.fsm.state)
-        self.fsm.get_state(self.fsm.state).create_primitive(self.t, gripper="R_gripper", goal=self.goal,
+        self.fsm.get_state(self.fsm.state).create_primitive(self.t, gripper=self.gripper, goal=self.goal,
                                                         move_to=self.tower.get_placement())
 
     def step(self, t):
@@ -119,6 +122,9 @@ class PickAndPlace:
 
     def _is_open(self):
         return self.fsm.get_state(self.fsm.state).is_open()
+
+    def _is_done(self):
+        return self.fsm.get_state(self.fsm.state).is_done(self.t)
 
     def _has_Goal(self):
         """
@@ -146,6 +152,7 @@ class PickAndPlace:
     def place_goal_in_tower(self):
         print(f"Block {self.goal} was placed!!!")
         self.C.frame(self.goal).setColor([0, 0, 1])
+        self.V.setConfiguration(self.C)
         self.V.recopyMeshes(self.C)
         self.tower.add_block(self.goal)
         self.goal = None
@@ -154,3 +161,47 @@ class PickAndPlace:
 
         self.observed_blocks = blocks
 
+
+# noinspection PyTypeChecker
+class EdgeGrasper(PickAndPlace):
+
+    def __init__(self, C, S, V, tau):
+        # add all states
+        self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
+        self.pull_in = prim.PullIn(C, S, V, tau, 200, interpolation=True, vis=False)
+        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 600, interpolation=True, vis=False)
+        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 400, interpolation=True, vis=False)
+        self.edge_place = prim.EdgePlace(C, S, V, tau, 300, interpolation=False, vis=True)
+        self.tau = tau
+        self.name = "Panda"
+        self.state = None
+        self.t = 0
+        self.goal = None
+        self.gripper = "R_gripper"
+
+        self.C = C
+        self.V = V
+        self.observed_blocks = []
+
+        self.tower = Tower(C, V, [0.0, -0.3, .98])
+
+        # define list of states
+        self.states = [self.grav_comp, self.pull_in, self.push_to_edge, self.edge_grasp, self.edge_place]
+
+        # create finite state machine
+        self.fsm = Machine(states=self.states, initial=self.grav_comp,
+                           auto_transitions=False)
+        # add all transitions
+        self.fsm.add_transition("pull_in", source=self.grav_comp, dest=self.pull_in, conditions=self._has_Goal,
+                                after=self.init_state)
+        self.fsm.add_transition("push_to_edge", source=self.pull_in, dest=self.push_to_edge, conditions=self._is_done,
+                                after=self.init_state)
+        self.fsm.add_transition("edge_grasp", source=self.push_to_edge, dest=self.edge_grasp, conditions=self._is_done,
+                                after=self.init_state)
+        self.fsm.add_transition("edge_place", source=self.edge_grasp, dest=self.edge_place, conditions=self._is_grasping,
+                                after=self.init_state)
+        self.fsm.add_transition("is_done", source=self.edge_place, dest=self.grav_comp, conditions=self._is_open,
+                                after=self.init_state)
+        self.init_state()
+
+        self.cheat = True

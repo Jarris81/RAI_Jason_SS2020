@@ -39,19 +39,19 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
         name = "obj%i" % o
         R.delFrame(name)
 
-    C, S, V = _get_CSV(R)
+    #C, S, V = _get_CSV(R)
 
-    return R, S, C, V, back_frame
+    return R, back_frame #  S, C, V,
 
 
 def setup_env_subgoal_1(show_background=False):
     num_blocks = 2
-    R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+    R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
     side = 0.13
     positions =[
         [0.3, .3, 0.65+side/2],
-        [-0.1, 0, 0.65+side/2],
+        [0.6, 0.2, 0.65+side/2],
         #[0.0, -.2, 0.65+side/2],
         #[-0.1, 0, 0.65+side/2],
         #[0.1, 0, 0.65+side/2],
@@ -61,7 +61,7 @@ def setup_env_subgoal_1(show_background=False):
         box = R.frame(name)
         box.setPosition(positions[o])
         box.setColor([1, 0, 0])
-        box.setShape(ry.ST.ssBox, size=[side, side, side, 0.001])
+        box.setShape(ry.ST.box, size=[side, side, side, 0.001])
         box.setQuaternion([1, 0, 0, 0])
         box.setContact(1)
 
@@ -71,7 +71,7 @@ def setup_env_subgoal_1(show_background=False):
 
 def setup_env_subgoal_2(show_background=False):
     num_blocks = 5
-    R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+    R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
     side = 0.13
     positions =[
@@ -86,7 +86,7 @@ def setup_env_subgoal_2(show_background=False):
         box = R.frame(name)
         box.setPosition(positions[o])
         box.setColor([1, 0, 0])
-        box.setShape(ry.ST.ssBox, size=[side-i*0.01, side-i*0.01, side-i*0.01, 0.001])
+        box.setShape(ry.ST.ssBox, size=[side-i*0.01, side-i*0.01, side-i*0.01, 0.])
         box.setQuaternion([1, 0, 0, 0])
         box.setContact(1)
 
@@ -97,19 +97,19 @@ def setup_env_subgoal_2(show_background=False):
 
 def setup_env_test_edge_grasp(show_background=False):
     num_blocks = 1
-    R, S, C, V, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+    R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
     height = 0.08
     width = 0.3
     length = width
-    position = [.75, 0.2, 0.65+height/2]
+    position = [.85, 0.0, 0.65+height/2]
     box = R.frame("obj0")
     box.setPosition(position)
     box.setColor([1, 0, 0])
-    box.setShape(ry.ST.ssBox, size=[length, width, height, 0.001])
-    box.setQuaternion([1, 0, 0, 0.2])
-    box.setMass(1e8)
+    box.setShape(ry.ST.ssBox, size=[length, width, height, 0])
+    box.setQuaternion([1, 0, 0, 0])
     box.addAttribute("friction", 1.0)
+    box.setContact(1)
 
     C, S, V = _get_CSV(R)
 
