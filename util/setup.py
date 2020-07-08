@@ -57,7 +57,7 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
 
 
 def setup_color_challenge_env():
-    random.seed(9)
+    random.seed(10)
 
     R = ry.Config()
 
@@ -71,10 +71,10 @@ def setup_color_challenge_env():
     for o in range(0, obj_count):
         # color = list(np.random.choice(np.arange(0, 1, 0.05), size=2)) + [1]
         # color = list(np.random.choice(np.arange(0, 1, 0.01), size=3))
-        color = random.choice([[0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0],
-                               [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]])
+        color = [[0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0],
+                               [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
         name = "obj%i" % o
-        R.frame(name).setColor(color)
+        R.frame(name).setColor(color[o])
         # info = R.frame(name).info()
 
     S = R.simulation(ry.SimulatorEngine.physx, True)
@@ -84,7 +84,6 @@ def setup_color_challenge_env():
     C.addFile(join(pathRepo, 'scenarios/pandasTable.g'))
     V = ry.ConfigurationViewer()
     V.setConfiguration(C)
-    cameraFrame = C.frame("camera")
 
     q0 = C.getJointState()
     R_gripper = C.frame("R_gripper")

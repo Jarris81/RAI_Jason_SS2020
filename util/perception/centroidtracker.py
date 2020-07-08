@@ -24,6 +24,8 @@ class CentroidTracker():
     def register(self, obj_dict):
         # when registering an object we use the next available object
         # ID to store the centroid
+        obj_dict["points"] = []
+        obj_dict["lenght"] = []
         self.objects[self.nextObjectID] = obj_dict
         self.disappeared[self.nextObjectID] = 0
         self.nextObjectID += 1
@@ -35,9 +37,13 @@ class CentroidTracker():
         del self.disappeared[objectID]
 
     def update(self, obj_info):
+
         center_points = []
+        color_masks = []
         for object in obj_info:
             center_points.append(object["center"])
+            color_masks.append(object["color_mask"])
+
         # no center points found?
         if len(center_points) == 0:
             # loop over any existing tracked objects and mark them
@@ -113,6 +119,7 @@ class CentroidTracker():
                 # counter
                 objectID = objectIDs[row]
                 self.objects[objectID]["center"] = inputCentroids[col]
+                self.objects[objectID]["color_mask"] = color_masks[col]
                 self.disappeared[objectID] = 0
 
                 # indicate that we have examined each of the row and
@@ -149,7 +156,7 @@ class CentroidTracker():
             else:
                 # TODO
                 for col in unusedCols:
-                    self.register(inputCentroids[col])
+                    self.register(obj_info[col])
 
         # return the set of trackable objects
         return self.objects
