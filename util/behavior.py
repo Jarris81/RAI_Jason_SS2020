@@ -5,6 +5,12 @@ import libry as ry
 import copy
 from functools import partial
 from guppy import hpy
+import numpy as np
+
+
+#
+MAX_DISTANCE_TOP_GRASP = 1.0  # 1
+MAX_GRIPPER_WIDTH = 0.2
 
 
 class GrabAndLift:
@@ -86,19 +92,16 @@ class PickAndPlace:
 
         # create finite state machine
         self.fsm = Machine(states=self.states, initial=self.grav_comp,
-                           auto_transitions=False)
+                           auto_transitions=False, after_state_change=self.init_state)
         # add all transitions
-        self.fsm.add_transition("do_top_grasp", source=self.grav_comp, dest=self.top_grasp, conditions=self._has_Goal,
-                                after=self.init_state)
-        self.fsm.add_transition("is_done", source=self.top_grasp, dest=self.top_place, conditions=self._is_grasping,
-                                after=self.init_state)
+        self.fsm.add_transition("do_top_grasp", source=self.grav_comp, dest=self.top_grasp,
+                                conditions=[self._has_Goal, self._do_top_grasp])
+        self.fsm.add_transition("is_done", source=self.top_grasp, dest=self.top_place, conditions=self._is_grasping)
         self.fsm.add_transition("is_done", source=self.top_place, dest=self.grav_comp, conditions=self._is_open,
-                                before=self.place_goal_in_tower, after=self.init_state)
+                                before=self.place_goal_in_tower)
         self.init_state()
 
         self.cheat = True
-
-
 
     def init_state(self):
         print("inting new state")
@@ -113,7 +116,7 @@ class PickAndPlace:
         for trigger in self.fsm.get_triggers(self.fsm.state):
             # leave if transition was made
             if self.fsm.trigger(trigger):
-                break
+                break  # leave loop when trigger was made
         # make a step with the current state
         self.fsm.get_state(self.fsm.state).step(self.t)
 
@@ -132,20 +135,18 @@ class PickAndPlace:
         :param hasGoal:
         :return:
         """
-
         # get all the blocks which are not in tower
-        unplaced_blocks = [block for block in self.observed_blocks if block not in self.tower.get_blocks()]
+        unplaced_blocks = list(filter(lambda x: self._filter_block(x), self.observed_blocks))
+
         # return false if no block available to place
         if not len(unplaced_blocks):
             return False
 
         # would have to sort and filter blocks somehow, according to size, distance etc
-        sorted_filtered_blocks = unplaced_blocks
+        unplaced_blocks.sort(key=self._get_block_utility, reverse=True)  # highest utility should be placed first
 
-        if not len(sorted_filtered_blocks):
-            return False
         # get the first in list
-        self.goal = sorted_filtered_blocks[0]
+        self.goal = unplaced_blocks[0]
         print(f"New Goal is : {self.goal}!")
         return True
 
@@ -161,6 +162,34 @@ class PickAndPlace:
 
         self.observed_blocks = blocks
 
+    def _filter_block(self, block):
+
+        return block not in self.tower.get_blocks()
+
+    def _get_block_utility(self, block):
+
+        block_size = self.C.frame(block).getSize()
+
+        return block_size[0] * block_size[1]
+
+    def _do_top_grasp(self):
+        """
+        Check if the robot should do a top grasp on the decided goal
+        :return: True if a top grasp is possible
+        """
+        # check if we have a goal
+        if not self.goal:
+            return False
+
+        # check if block is not too far away
+
+        # check if length or width of block is smaller than gripper
+        goal_size = self.C.frame(self.goal).getSize()
+        if np.all(goal_size[:2] > MAX_GRIPPER_WIDTH):
+            return False
+
+        return True
+
 
 # noinspection PyTypeChecker
 class EdgeGrasper(PickAndPlace):
@@ -172,6 +201,8 @@ class EdgeGrasper(PickAndPlace):
         self.push_to_edge = prim.PushToEdge(C, S, V, tau, 600, interpolation=True, vis=False)
         self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 400, interpolation=True, vis=False)
         self.edge_place = prim.EdgePlace(C, S, V, tau, 300, interpolation=False, vis=True)
+        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 300, interpolation=True, vis=False)
+        self.reset = prim.Drop(C, S, V, tau, 150, interpolation=True, vis=False)
         self.tau = tau
         self.name = "Panda"
         self.state = None
@@ -183,25 +214,26 @@ class EdgeGrasper(PickAndPlace):
         self.V = V
         self.observed_blocks = []
 
-        self.tower = Tower(C, V, [0.0, -0.3, .98])
+        self.tower = Tower(C, V, [0.0, -0.3, .68])
 
         # define list of states
-        self.states = [self.grav_comp, self.pull_in, self.push_to_edge, self.edge_grasp, self.edge_place]
+        self.states = [self.grav_comp, self.pull_in, self.push_to_edge, self.edge_grasp,
+                       self.edge_place, self.edge_drop, self.reset]
 
         # create finite state machine
         self.fsm = Machine(states=self.states, initial=self.grav_comp,
-                           auto_transitions=False)
+                           auto_transitions=False, after_state_change=self.init_state)
         # add all transitions
-        self.fsm.add_transition("pull_in", source=self.grav_comp, dest=self.pull_in, conditions=self._has_Goal,
-                                after=self.init_state)
-        self.fsm.add_transition("push_to_edge", source=self.pull_in, dest=self.push_to_edge, conditions=self._is_done,
-                                after=self.init_state)
-        self.fsm.add_transition("edge_grasp", source=self.push_to_edge, dest=self.edge_grasp, conditions=self._is_done,
-                                after=self.init_state)
-        self.fsm.add_transition("edge_place", source=self.edge_grasp, dest=self.edge_place, conditions=self._is_grasping,
-                                after=self.init_state)
-        self.fsm.add_transition("is_done", source=self.edge_place, dest=self.grav_comp, conditions=self._is_open,
-                                after=self.init_state)
+        self.fsm.add_transition("pull_in", source=self.grav_comp, dest=self.pull_in, conditions=self._has_Goal)
+        self.fsm.add_transition("push_to_edge", source=self.pull_in, dest=self.push_to_edge, conditions=self._is_done)
+        self.fsm.add_transition("edge_grasp", source=self.push_to_edge, dest=self.edge_grasp, conditions=self._is_done)
+        self.fsm.add_transition("edge_place", source=self.edge_grasp, dest=self.edge_drop, conditions=self._is_grasping)
+        self.fsm.add_transition("is_done", source=[self.edge_place], dest=self.grav_comp,
+                                conditions=self._is_open,  before=self.place_goal_in_tower)
+        self.fsm.add_transition("reset", source=self.edge_drop, dest=self.reset,
+                                conditions=self._is_open)
+        self.fsm.add_transition("is_done_dropping", source=[self.reset], dest=self.grav_comp,
+                                conditions=self._is_done, after=self.place_goal_in_tower)
         self.init_state()
 
         self.cheat = True

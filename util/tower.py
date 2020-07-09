@@ -8,7 +8,11 @@ class Tower:
         self.V = V
 
     def add_block(self, block):
-
+        # update the placement when adding a block
+        block_pos = self.C.frame(block).getPosition()
+        self.posXY[:2] = block_pos[:2]
+        print(self.posXY)
+        # add to tower
         self.blocks.append(block)
 
     def get_placement(self):
