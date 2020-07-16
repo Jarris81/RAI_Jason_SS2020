@@ -2,6 +2,7 @@ import libry as ry
 
 import numpy as np
 import cv2 as cv
+import time
 
 from util.setup import setup_color_challenge_env
 from util.setup import setup_camera
@@ -9,6 +10,15 @@ from util.setup import setup_camera
 import util.perception.cuboid_detection as pt
 
 from util.perception.centroidtracker import CentroidTracker
+
+from util.transformations import quaternion_from_matrix
+from util.behavior import EdgeGrasper
+
+def cheat_update_goal(goal):
+    goal.setPosition(S.getGroundTruthPosition("obj4"))
+    #goal.setShape(ry.ST.ssBox, size=S.getGroundTruthSize("obj4"))
+    goal.setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix("obj4")))
+
 
 if __name__ == "__main__":
 
@@ -83,6 +93,23 @@ if __name__ == "__main__":
                 break
 
         S.step([], tau, ry.ControlMode.none)
+
+    # TODO set fix camera position
+
+    goal = C.getFrame("goal")
+    # cheat and set goal in config from simulation
+    # cheat_update_goal(goal)
+    V.setConfiguration(C)
+
+    panda = EdgeGrasper(C, S, V, tau)
+
+    for t in range(10000):
+        time.sleep(tau)
+        if t > 100 and t % rate_camera:
+            cheat_update_goal(goal)
+            panda.set_blocks(["goal"])
+
+        panda.step(t)
     # TODO: decide on goal from the frames
 
     # TODO decide on Grasp - also add perception stuff. Maybe check object position with the last object IDs?

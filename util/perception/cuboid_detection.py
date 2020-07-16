@@ -336,11 +336,14 @@ def add_comp_frame(id, objects, C):
     pos = remove_outliers(np.array(objects[id]["pos"]))
     pos_est = np.mean(pos, axis=0)
 
-    obj = C.addFrame("obj" + str(id))
+    if id == 4:
+        obj = C.addFrame("goal")
+    else:
+        obj = C.addFrame("obj" + str(id))
     obj.setColor(objects[id]["obj_color"])
     obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.01])
     obj.setPosition([pos_est[0], pos_est[1], pos_est[2]])
-    obj.setMass(1)
+    # obj.setMass(1)
     obj.setContact(1)
     print(objects[id]["obj_color"])
 
