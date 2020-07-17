@@ -16,7 +16,7 @@ from util.behavior import EdgeGrasper
 
 def cheat_update_goal(goal):
     goal.setPosition(S.getGroundTruthPosition("obj4"))
-    #goal.setShape(ry.ST.ssBox, size=S.getGroundTruthSize("obj4"))
+    goal.setShape(ry.ST.ssBox, size=S.getGroundTruthSize("obj4"))
     goal.setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix("obj4")))
 
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
             seen_obj = np.zeros(len(objects))
             # for each object save the sidelenght and position - here main part of object recognition
             for id, obj_info in objects.items():
-                pos, x, y, z = pt.detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id, obj_info)
+                pos, x, y, z = pt.detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id)
                 # if we have enough data or each object we can then add the to the configuration space
                 if len(pos) > 25 and len(x) > 20 and len(y) > 20 and len(z) > 20:
                     seen_obj[id] = 1
@@ -96,9 +96,13 @@ if __name__ == "__main__":
 
     # TODO set fix camera position
 
-    goal = C.getFrame("goal")
+    # goal = C.getFrame("goal")
+
+
+    goal = C.addFrame("goal")
+    goal.setContact(1)
     # cheat and set goal in config from simulation
-    # cheat_update_goal(goal)
+    cheat_update_goal(goal)
     V.setConfiguration(C)
 
     panda = EdgeGrasper(C, S, V, tau)

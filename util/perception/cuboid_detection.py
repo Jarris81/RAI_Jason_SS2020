@@ -17,6 +17,7 @@ from squaternion import Quaternion
 
 """
 
+
 def get_obj_infos(R):
     obj_info = []
 
@@ -28,6 +29,7 @@ def get_obj_infos(R):
             obj_info.append([hsv_color[0] * 180, hsv_color[1] * 255, hsv_color[2] * 255])
 
     return obj_info
+
 
 def move_camera(t, camera, angle, radius):
     """
@@ -60,6 +62,7 @@ def move_camera(t, camera, angle, radius):
     angle += 0.0872665
     return angle
 
+
 def mask_colored_object(hsv_colors, rgb):
     """
     Detects the color mask for each object
@@ -74,7 +77,7 @@ def mask_colored_object(hsv_colors, rgb):
     for hsv in hsv_colors:
         center_points = []
         lower_color = np.array([hsv[0], 150, 150])
-        upper_color = np.array([hsv[0], 255, 255])
+        upper_color = np.array([hsv[0], 250, 250])
         mask = cv.inRange(hsv_image, lower_color, upper_color)
 
         obj_dict["color_mask"] = mask
@@ -139,9 +142,12 @@ def order_points(pts):
     # bottom-right, and bottom-left order
     return np.array([tl, tr, br, bl], dtype="int32")
 
+
 # TODO fnish comments
-def detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id, obj_info):
+def detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id):
     """
+    Main function for recognition of the corner points of a cuboid and computing the position
+    and lenght of all three side of an object
 
     :param S: Simulation View - later for computing the pointcloud (to not do it in each step)
     :param camera: RealWorld Camera
@@ -150,30 +156,33 @@ def detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id, obj_info):
     :param depth: depth image
     :param objects: the tracked objects with dict of all object onfos
     :param id: id of the current object
-    :param obj_info:
-    :return:
+    :return: ob the object with the id all computed positions and lenght
     """
-    # mask = obj_info['color_mask']
-    mask = objects[id]["color_mask"]
+
+    # save the founded "good" sides. Just if we found three sides we can go to the next step
     founded_sides = []
+
+    # 1. Make all computations inside a color mask. So find there the edges, corner points ...
+    mask = objects[id]["color_mask"]
     gray = cv.cvtColor(rgb, cv.COLOR_BGR2GRAY)
 
     number_of_sides_found = 0
-    masked_image = gray * mask
+    masked_image = gray * mask  # image where just the color mask is important
 
     # get edges inside the colored object
     # canny edge detection
     edges = cv.Canny(masked_image, 15, 35)
-    # kernel = np.ones((3, 3), np.uint8)
     edges = cv.dilate(edges, None, iterations=1)
     edges = cv.erode(edges, None, iterations=1)
 
-    # find contours in edges
+    # find contours in edges - hopefully the rectangle sides
     contours, hierarchy = cv.findContours(edges, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     hierarchy = hierarchy[0]  # get the actual inner list of hierarchy descriptions
 
-    # Grab only the innermost child components
+    # Grab only the innermost child components - remove contours in contours
     inner_contours = [c[0] for c in zip(contours, hierarchy)]
+
+    # Sort Contours on the basis of their x-axis coordinates in ascending order (from left to right)
     sorted_contours = sort_contours(inner_contours)
     if sorted_contours:
         for cnt in sorted_contours:
@@ -187,35 +196,33 @@ def detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id, obj_info):
             cv.drawContours(mask2, cnt, -1, 255, 1)
             mean_depth = cv.mean(depth, mask=mask2)
 
+            # approximate the contour form = here we want restangles, so len(approx) == 4
             approx = cv.approxPolyDP(cnt, 0.04 * cv.arcLength(cnt, True), True)
 
             if mean_depth[0] < 2 and len(approx) == 4:
 
-                number_of_sides_found += 1
-                # good_contour.append(cnt)
+                # compute the convexHull - here the 4 corner points
                 hull = cv.convexHull(approx, False)
 
-                lenght = len(hull)
                 if len(hull) != 4:
                     break
 
-                a, b, c, d = hull
-                # corner_points = [a[0].tolist(), b[0].tolist(), c[0].tolist(), d[0].tolist()]
-                corner_points = np.array([a[0], b[0], c[0], d[0]])
-                # order the point in top-left, top-right, bottom-right and bottom-left
+                # sort the corner points from upper left, upper right, lower right to lower left
+                corner_points = np.array([hull[0][0], hull[1][0], hull[2][0], hull[3][0]])
                 corner_points_ordered = order_points(corner_points)
 
-                # hull_num = cv.convexHull(approx, returnPoints=False)
+                # we found a "nice" side which we can use for further computation
                 founded_sides.append(corner_points_ordered)
+                number_of_sides_found += 1
 
-                M = cv.moments(approx)
-                if M["m00"] != 0:
-                    cX = int(M["m10"] / M["m00"])
-                    cY = int(M["m01"] / M["m00"])
+                # M = cv.moments(approx)
+                # if M["m00"] != 0:
+                #     cX = int(M["m10"] / M["m00"])
+                #     cY = int(M["m01"] / M["m00"])
 
-                # # if we found 3 sides of the cube then we csave the size and position of the object
+                # if we found 3 "good" sides we can compute the object size and position (or try it :) )
                 if number_of_sides_found == 3:
-                    computeObjectInfo(founded_sides, camera, fxfypxpy, depth, objects, id, S)
+                    computeObjectInfo(S, camera, fxfypxpy, depth, objects, id, founded_sides)
 
                     # cv.circle(rgb, (cX, cY), 3, (255, 255, 255), -1)
                     # cv.putText(rgb, "center", (cX - 20, cY - 20),
@@ -227,13 +234,15 @@ def detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id, obj_info):
     return objects[id]["pos"], objects[id]["lenghtX"], objects[id]["lenghtY"], objects[id]["lenghtZ"]
 
 
-def computeObjectInfo(founded_sides, camera, fxfypxpy, depth, objects, id, S):
-    # side1, side2, side3 = founded_sides
+def computeObjectInfo(S, camera, fxfypxpy, depth, objects, id, founded_sides):
+
     pointcloud = S.depthData2pointCloud(depth, fxfypxpy)
 
     cam_rot = camera.getRotationMatrix()
     cam_trans = camera.getPosition()
-    # #
+
+    # use this part to show the vectors for 1 (!) object
+    # side1, side2, side3 = founded_sides
     # point11 = pointcloud[side1[0][1], side1[0][0]] @ cam_rot.T + cam_trans
     # point12 = pointcloud[side1[1][1], side1[1][0]] @ cam_rot.T + cam_trans
     # point13 = pointcloud[side1[2][1], side1[2][0]] @ cam_rot.T + cam_trans
@@ -259,6 +268,7 @@ def computeObjectInfo(founded_sides, camera, fxfypxpy, depth, objects, id, S):
     # ax.quiver(X, Y, Z, U, V, W)
     # plt.show()
 
+    # axis vectors
     vecx = [-1, 0, 0]
     vecy = [0, 1, 0]
     vecz = [0, 0, 1]
@@ -267,24 +277,37 @@ def computeObjectInfo(founded_sides, camera, fxfypxpy, depth, objects, id, S):
     points3d = []
     vectors3d = []
 
+    # count which sides we found. if we have 3 rectangles for 3 sides we should find 4 sides in direction of x, y and z
+    # Just possible because we use the assumption to not have a rotated object.
     numx = 0
     numy = 0
     numz = 0
+
     for side in founded_sides:
         points = []
         vectors = []
         for i, point in enumerate(side):
+            # get the "real" 3D points to the camera
             points.append(pointcloud[point[1], point[0]]
                           @ cam_rot.T + cam_trans)
+            # after we have all corner points of a side we compute the vectors of each side for the rectangle
             if i == 3:
                 vectors.append(
                     [points[1] - points[0], points[1] - points[2], points[2] - points[3], points[0] - points[3]])
-                # Check if all sides in 90 degree to each other
+
+                # TODO could do a better check if points maybe outside of the objectt
+                # e.g. by checking the depth in compare to the other points?
+
+                # Now we had sometimes the problem also when we found all three sides, that one point might be outside
+                # of the object, so we get a different depth and a wrong point
+                # For this reason we compute the angle between the vectors on 1 side. Because its a rectangle the angles
+                # shouled be around 90 degree
                 for j, v in enumerate(vectors[0]):
                     if j == 3:
                         vec_angle = angle_betweenVectors(v, vectors[0][0])
                     else:
                         vec_angle = angle_betweenVectors(v, vectors[0][j + 1])
+                    # here check if angle is ~ 90 degree. If not we ignore the detected object
                     if 70 > vec_angle or vec_angle > 110:
                         return
 
@@ -337,15 +360,16 @@ def add_comp_frame(id, objects, C):
     pos_est = np.mean(pos, axis=0)
 
     if id == 4:
-        obj = C.addFrame("goal")
+        pass
     else:
         obj = C.addFrame("obj" + str(id))
-    obj.setColor(objects[id]["obj_color"])
-    obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.01])
-    obj.setPosition([pos_est[0], pos_est[1], pos_est[2]])
-    # obj.setMass(1)
-    obj.setContact(1)
-    print(objects[id]["obj_color"])
+        obj.setColor(objects[id]["obj_color"])
+        obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.01])
+        obj.setPosition([pos_est[0], pos_est[1], pos_est[2]])
+        obj.setMass(0.2)
+        obj.setContact(1)
+        print(objects[id]["obj_color"])
+
 
 # numpy.median is rather slow, let's build our own instead
 def median(x):
@@ -353,6 +377,7 @@ def median(x):
     middle = np.arange((m - 1) >> 1, (m >> 1) + 1)
     x = np.partition(x, middle, axis=0)
     return x[middle].mean(axis=0)
+
 
 # main function
 def remove_outliers(data, thresh=2.0):
