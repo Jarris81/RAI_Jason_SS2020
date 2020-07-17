@@ -71,15 +71,19 @@ class TowerBuilder:
 
     def __init__(self, C, S, V, tau):
         # add all states
+
+        # primitives
         self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 200, interpolation=True, vis=False)
-        self.top_place = prim.TopPlace(C, S, V, tau, 200, interpolation=True, vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 1000, interpolation=True, vis=False)
+        self.top_place = prim.TopPlace(C, S, V, tau, 1000, interpolation=True, vis=False)
         self.pull_in = prim.PullIn(C, S, V, tau, 200, interpolation=True, vis=False)
         self.push_to_edge = prim.PushToEdge(C, S, V, tau, 600, interpolation=True, vis=False)
         self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 500, interpolation=True, vis=False)
         self.edge_place = prim.EdgePlace(C, S, V, tau, 300, interpolation=False, vis=True)
         self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 500, interpolation=True, vis=False)
-        self.reset = prim.Drop(C, S, V, tau, 150, interpolation=True, vis=False)
+        self.drop = prim.Drop(C, S, V, tau, 150, interpolation=True, vis=False)
+
+        # functions
         self.tau = tau
         self.name = "Panda"
         self.state = None
@@ -91,10 +95,10 @@ class TowerBuilder:
         self.V = V
         self.observed_blocks = []
 
-        self.tower = Tower(C, V, [0.0, -0.3, .68])
+        self.tower = Tower(C, V, [0.0, -0.3, .7])
 
         # define list of states
-        self.states = [self.grav_comp, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop]
+        self.states = [self.grav_comp, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop, self.drop]
 
         # create finite state machine
         self.fsm = Machine(states=self.states, initial=self.grav_comp,
@@ -107,9 +111,14 @@ class TowerBuilder:
                                 conditions=[self._has_Goal, self._do_edge_grasp])
         self.fsm.add_transition("do_edge_drop", source=self.edge_grasp, dest=self.edge_drop,
                                 conditions=[self._is_grasping])
+        self.fsm.add_transition("do_edge_drop", source=self.edge_drop, dest=self.drop,
+                                conditions=[self._is_open])
+        self.fsm.add_transition("do_edge_drop", source=self.edge_grasp, dest=self.edge_drop,
+                                conditions=[self._is_grasping])
         self.fsm.add_transition("is_done", source=self.top_grasp, dest=self.top_place, conditions=self._is_grasping)
-        self.fsm.add_transition("is_done", source=self.top_place, dest=self.grav_comp, conditions=self._is_open,
-                                before=self.place_goal_in_tower)
+        # transitions returning to grav comp
+        self.fsm.add_transition("is_done_dropping", source=[self.drop, self.top_place], dest=self.grav_comp,
+                                conditions=self._is_done, after=self.place_goal_in_tower)
         self.init_state()
 
         self.cheat = True
@@ -159,7 +168,7 @@ class TowerBuilder:
 
         # get the first in list
         self.goal = unplaced_blocks[0]
-        print(f"New Goal is : {self.goal}!")
+        #print(f"New Goal is : {self.goal}!")
         return True
 
     def place_goal_in_tower(self):
@@ -175,17 +184,26 @@ class TowerBuilder:
         self.observed_blocks = blocks
 
     def _filter_block(self, block):
-
+        """
+        Filter all blocks which are already in tower and are too far away
+        :param block:
+        :return:
+        """
         return block not in self.tower.get_blocks()
 
     def _get_block_utility(self, block):
-
+        """
+        Sort Blocks after utlity, atm only size of XY-Area
+        :param block:
+        :return:
+        """
         block_size = self.C.frame(block).getSize()
 
         return block_size[0] * block_size[1]
 
     def _do_top_grasp(self):
         """
+        Conditional Function for state machine
         Check if the robot should do a top grasp on the decided goal
         :return: True if a top grasp is possible
         """
@@ -204,20 +222,21 @@ class TowerBuilder:
 
     def _do_edge_grasp(self):
         """
-        Check if the robot should do a top grasp on the decided goal
-        :return: True if a top grasp is possible
+        Conditional Function for state machine
+        Check if the robot should do a edge grasp on the decided goal
+        :return: True if a edge grasp is possible
         """
         # check if we have a goal
         if not self.goal:
             return False
 
-        table_xy_limit = np.array([0.85, 0.08, 1.3, 0.12])
+        table_right_edge_xy_limit = np.array([0.85, 0.08, 1.0, 0.12])
         # check if block is located at edge
         # check if height of block is small enough
         goal_position = self.C.frame(self.goal).getPosition()
         # check if lower and upper limit is ok
-        if not np.all(table_xy_limit[:2] < goal_position[:2]) and \
-                not np.all(goal_position[:2] < table_xy_limit[2:]):
+        if not np.all(table_right_edge_xy_limit[:2] < goal_position[:2]) and \
+                not np.all(goal_position[:2] < table_right_edge_xy_limit[2:]):
             return False
 
         # check if height of block is small enough
