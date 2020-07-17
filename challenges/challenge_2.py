@@ -2,7 +2,7 @@ import time
 
 import libry as ry
 
-from util.behavior import PickAndPlace
+from util.behavior import TowerBuilder
 from util.setup import setup_camera
 from util.setup import setup_env_subgoal_2
 from util.transformations import quaternion_from_matrix
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     hasGoal = False
 
-    panda = PickAndPlace(C, S, V, tau)
+    panda = TowerBuilder(C, S, V, tau)
 
     # used for shortcutting perception
     num_blocks = 5

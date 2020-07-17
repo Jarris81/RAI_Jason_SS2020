@@ -13,7 +13,7 @@ import util.transformations as _tf
 from util.planner import set_goal_ball
 import util.primitive as prim
 from util.behavior import GrabAndLift
-from util.behavior import PickAndPlace
+from util.behavior import TowerBuilder
 from transitions import Machine
 from functools import partial
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     hasGoal = False
 
-    panda = PickAndPlace(C, S, V, tau)
+    panda = TowerBuilder(C, S, V, tau)
 
     for t in range(1000):
         time.sleep(tau)
