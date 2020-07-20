@@ -11,3 +11,4 @@ Primitive/ Movement Constants
 """
 
 OVERHEAD_VIA = 0.2
+MIN_OVERHEAD = 0.6

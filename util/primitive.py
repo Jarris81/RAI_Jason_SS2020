@@ -3,6 +3,7 @@ import numpy as np
 import time
 from transitions import State
 import util.bezier as beziers
+impo
 
 
 class Primitive(State):
@@ -24,7 +25,7 @@ class Primitive(State):
         self.vis = vis
         self.use_interpolation = interpolation
         self.max_place_counter = 20
-        self.min_overhead = 1.4
+        self.min_overhead = cons
 
         # mask to make sure the fingers do not change
         self.mask_gripper = [0] * 16
