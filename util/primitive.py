@@ -208,6 +208,7 @@ class GravComp(Primitive):
     def __init__(self, C, S, V, tau, n_steps, vis=False):
         Primitive.__init__(self, "grav_comp", C, S, V, tau, n_steps,
                            grasping=False, holding=False, placing=False, vis=vis)
+        self.q_goal = S.get_q()
 
     def create_primitive(self, t_start, gripper, goal, move_to=None):
         print(self.q_start)
