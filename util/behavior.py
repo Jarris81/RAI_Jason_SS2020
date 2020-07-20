@@ -72,16 +72,16 @@ class TowerBuilder:
         # add all states
 
         # primitives
-        self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
-        self.reset = prim.Reset(C, S, V, tau, 1000, komo=False, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 1000, komo=False, vis=False)
-        self.top_place = prim.TopPlace(C, S, V, tau, 1000, komo=False, vis=False)
+        self.grav_comp = prim.GravComp(C, S, V, tau, 10, vis=False)
+        self.reset = prim.Reset(C, S, V, tau, 10, komo=False, vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 10, komo=False, vis=False)
+        self.top_place = prim.TopPlace(C, S, V, tau, 10, komo=False, vis=False)
         self.pull_in = prim.PullIn(C, S, V, tau, 200, komo=False, vis=False)
-        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 2000, komo=False, vis=False)
-        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 1000, komo=False, vis=True)
-        self.edge_place = prim.EdgePlace(C, S, V, tau, 1000, komo=False, vis=False)
-        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 1000, komo=False, vis=False)
-        self.drop = prim.Drop(C, S, V, tau, 150, komo=False, vis=False)
+        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 5, komo=False, vis=False)
+        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 2, komo=True, vis=True)
+        self.edge_place = prim.EdgePlace(C, S, V, tau, 10, komo=False, vis=False)
+        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 10, komo=False, vis=False)
+        self.drop = prim.Drop(C, S, V, tau, 5, komo=False, vis=False)
 
         # functions
         self.tau = tau
@@ -247,6 +247,27 @@ class TowerBuilder:
         # check if length or width of block is smaller than gripper
         goal_size = self.C.frame(self.goal).getSize()
         if np.all(goal_size[:2] > MAX_GRIPPER_WIDTH):
+            return False
+
+        return True
+
+    def _do_pull_in(self):
+        """
+        Conditional Function for state machine
+        Check if the robot should do a top grasp on the decided goal
+        :return: True if a top grasp is possible
+        """
+        # check if we have a goal
+        if not self.goal:
+            return False
+        goal_position = self.C.frame(self.goal).getPosition()
+        push_to_edge_y_limits = np.array([-0.1, 0.2])
+        if not push_to_edge_y_limits[0] < goal_position[1] < push_to_edge_y_limits[-1]:
+            return False
+
+        # check if length or width of block is smaller than gripper
+        goal_size = self.C.frame(self.goal).getSize()
+        if np.all(goal_size[2] > MAX_GRIPPER_WIDTH):
             return False
 
         return True

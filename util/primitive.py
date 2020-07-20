@@ -10,13 +10,13 @@ import util.constants as constants
 
 class Primitive(State):
 
-    def __init__(self, name, C, S, V, tau, n_steps,
+    def __init__(self, name, C, S, V, tau, duration,
                  grasping=False, holding=False, placing=False,
                  komo=False, vis=False):
 
         State.__init__(self, name)
-        self.duration = tau * n_steps
-        self.n_steps = n_steps*0.001/tau
+        self.duration = duration
+        self.n_steps = int(duration/tau)
         self.tau = tau
         self.C = C
         self.S = S
@@ -218,8 +218,8 @@ class GravComp(Primitive):
     Special class for holding the current position, waiting for an event to happen
     """
 
-    def __init__(self, C, S, V, tau, n_steps, vis=False):
-        Primitive.__init__(self, "grav_comp", C, S, V, tau, n_steps,
+    def __init__(self, C, S, V, tau, duration, vis=False):
+        Primitive.__init__(self, "grav_comp", C, S, V, tau, duration,
                            grasping=False, holding=False, placing=False, vis=vis)
 
     def create_primitive(self, t_start, gripper, goal, move_to=None):
@@ -246,8 +246,8 @@ class GravComp(Primitive):
 
 
 class Reset(Primitive):
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration,
                            grasping=False, holding=False, placing=False, komo=komo, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -283,8 +283,8 @@ class Reset(Primitive):
 
 
 class Drop(Primitive):
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration,
                            grasping=False, holding=False, placing=False, komo=komo, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -336,9 +336,9 @@ class Drop(Primitive):
 
 class TopGrasp(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
 
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration,
                            grasping=True, holding=False, placing=False, komo=komo, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -402,8 +402,8 @@ class TopGrasp(Primitive):
 
 class TopPlace(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration,
                            grasping=False, holding=False, placing=True, komo=komo, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -502,8 +502,8 @@ class TopPlace(Primitive):
 
 class SideGrasp(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, vis=False):
-        Primitive.__init__(self, "side_grasp", C, S, V, tau, n_steps,
+    def __init__(self, C, S, V, tau, duration, vis=False):
+        Primitive.__init__(self, "side_grasp", C, S, V, tau, duration,
                            grasping=True, holding=False, placing=False, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -536,8 +536,8 @@ class SideGrasp(Primitive):
 
 class LiftUp(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, vis=False):
-        Primitive.__init__(self, "lift_up", C, S, V, tau, n_steps,
+    def __init__(self, C, S, V, tau, duration, vis=False):
+        Primitive.__init__(self, "lift_up", C, S, V, tau, duration,
                            grasping=False, holding=True, placing=False, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -566,8 +566,8 @@ class LiftUp(Primitive):
 
 class PullIn(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration, komo=komo,
                            grasping=False, holding=False, placing=False, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -636,8 +636,8 @@ class PullIn(Primitive):
 
 class PushToEdge(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration,
                            grasping=False, holding=False, placing=False, komo=komo, vis=vis)
 
         self.push_direction = 0
@@ -672,7 +672,9 @@ class PushToEdge(Primitive):
         return iK.getConfiguration(0)
 
     def _get_komo(self, move_to=None):
-        komo = self.C.komo_path(1, self.n_steps, self.duration, True)
+        time_per_phase =  int(1/self.tau)
+        print("time per phase is:", time_per_phase)
+        komo = self.C.komo_path(1, self.duration,time_per_phase, True)
         komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e0] * 16, order=2)
         # komo.addObjective(time=[0.0, 0.2], type=ry.OT.eq, feature=ry.FS.position, frames=[self.gripper],
         #                  target=[0, 0.0, 0.2], scale=[1e1] * 3, order=2)
@@ -730,13 +732,12 @@ class PushToEdge(Primitive):
 
 class EdgeGrasp(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration, komo=komo,
                            grasping=True, holding=False, placing=False, vis=vis)
         self.push_direction = 0
 
     def _get_goal_config(self, move_to=None):
-        print(self.q_start)
         # find out, which edge we are pushing
         block_pos = self.C.frame(self.goal).getPosition()
         # check if push to right or left edge of table
@@ -772,13 +773,19 @@ class EdgeGrasp(Primitive):
         return iK.getConfiguration(0)
 
     def _get_komo(self, move_to=None):
-        komo = self.C.komo_path(1, 200, self.duration, True)
-        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e1] * 16, order=2)
+        komo = self.C.komo_path(1.0, self.n_steps, self.n_steps*self.tau, True)
+        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e0] * 16, order=2)
         komo.addObjective(time=[1.0], type=ry.OT.eq, feature=ry.FS.qItself, target=self.q_goal,
-                          scale=[1e2] * 16)
-        #komo.addObjective(time=[0.6, 1.0], type=ry.OT.sos, feature=ry.FS.position, frames=[self.gripper],
-        #                  target=[0, 0.1, 0], scale=[1e2] * 3, order=2)
+                          scale=[1e3] * 16)
+        komo.addObjective(time=[], type=ry.OT.eq, feature=ry.FS.qItself, target=self.q_goal,
+                          scale=1e1*self.mask_gripper)
+        komo.addObjective(time=[0.7, 1.0], type=ry.OT.eq, feature=ry.FS.position, frames=[self.gripper],
+                          target=[0, 0.3, 0], scale=[1e2] * 3, order=2)
+        #komo.addObjective(time=[0.7, 1.0], type=ry.OT.eq, feature=ry.FS.vectorZ, frames=[self.gripper],
+        #                target=[0, -1, 0], scale=[1e2])
         komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e2])
+        komo.addObjective(time=[0, 0.7], type=ry.OT.ineq, feature=ry.FS.distance, frames=[self.goal, self.gripper],
+                          scale=[1e1])
         komo.optimize()
         return komo
 
@@ -807,8 +814,8 @@ class EdgeGrasp(Primitive):
 
 class EdgePlace(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration, komo=komo,
                            grasping=False, holding=False, placing=True, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -886,8 +893,8 @@ class EdgePlace(Primitive):
 
 class AngleEdgePlace(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
+    def __init__(self, C, S, V, tau, duration, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, duration, komo=komo,
                            grasping=False, holding=False, placing=True, vis=vis)
 
     def _get_goal_config(self, move_to=None):
