@@ -5,9 +5,12 @@ import util.geom as geom
 import time
 from util.planner import check_if_goal_constant
 from util.planner import set_goal_ball
-from util.perception.behavior import PickAndPlace
+import util.primitive as prim
+from util.behavior import GrabAndLift
+from util.behavior import TowerBuilder
+from transitions import Machine
+from functools import partial
 
-pathRepo = '/home/jason/git/robotics-course/'
 
 """
 Short example for testing the transition library, 
@@ -30,7 +33,7 @@ if __name__ == "__main__":
 
     hasGoal = False
 
-    panda = PickAndPlace(C, S, V, tau)
+    panda = TowerBuilder(C, S, V, tau)
 
     for t in range(1000):
         time.sleep(tau)

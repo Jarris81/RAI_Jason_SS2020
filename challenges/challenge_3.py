@@ -7,7 +7,6 @@ from util.setup import setup_camera
 from util.setup import setup_env_subgoal_3
 from util.transformations import quaternion_from_matrix
 
-
 """
 Short example for testing the transition library, 
 and building a state machine for the different primitives

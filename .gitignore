@@ -1,4 +1,6 @@
 .idea/*
 util/__pycache__/*
 *.global
+*/__pycache__/*
+util/path_to_rai_repo.py
 

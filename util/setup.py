@@ -2,7 +2,7 @@ import random
 import libry as ry
 import util.perception as perc
 from os.path import join
-from util.path_to_repo import path_to_rai
+from util.path_to_rai_repo import path_to_rai
 
 
 def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=False):
@@ -216,6 +216,7 @@ def setup_env_test_edge_grasp(show_background=False):
     width = 0.3
     length = width
     position = [0.9, 0.1, 0.65 + height / 2]
+
     box = R.frame("obj0")
     box.setPosition(position)
     box.setColor([1, 0, 0])
