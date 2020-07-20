@@ -4,7 +4,7 @@ import libry as ry
 
 from util.behavior import TowerBuilder
 from util.setup import setup_camera
-from util.setup import setup_env_subgoal_3
+from util.setup import setup_env_subgoal_4
 from util.transformations import quaternion_from_matrix
 
 """
@@ -29,21 +29,17 @@ def cheat_update_obj(obj):
 if __name__ == "__main__":
 
     # setup env and get background
-    R, S, C, V, back_frame = setup_env_subgoal_3(False)
+    R, S, C, V, back_frame = setup_env_subgoal_4(False)
     cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
     tau = .001
     rate_camera = 10
-
-    state = 0
-
-    hasGoal = False
 
     panda = TowerBuilder(C, S, V, tau)
 
     # used for shortcutting perception
     num_blocks = 2
 
-    for t in range(10000):
+    for t in range(100000):
         time.sleep(tau)
 
         # frame rate of camera, do perception here

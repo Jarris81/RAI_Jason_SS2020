@@ -3,7 +3,7 @@ from util.setup import setup_camera
 from util.setup import setup_env_test_edge_grasp
 from util.transformations import quaternion_from_matrix
 import time
-from util.perception.behavior import EdgeGrasper
+from util.behavior import TowerBuilder
 
 
 def cheat_update_goal(goal):
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # grav_comp = prim.GravComp(C, S, V, tau, 1000)
     # state = edge_grasp
 
-    panda = EdgeGrasper(C, S, V, tau)
+    panda = TowerBuilder(C, S, V, tau)
 
     for t in range(10000):
         time.sleep(tau)

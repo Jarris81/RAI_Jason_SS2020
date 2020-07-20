@@ -16,7 +16,7 @@ class Primitive(State):
 
         State.__init__(self, name)
         self.duration = tau * n_steps
-        self.n_steps = n_steps
+        self.n_steps = n_steps*0.001/tau
         self.tau = tau
         self.C = C
         self.S = S
@@ -28,7 +28,6 @@ class Primitive(State):
         self.use_komo = komo
         self.max_place_counter = 20
         self.min_overhead = const.MIN_OVERHEAD
-
 
         # mask to make sure the fingers do not change
         self.mask_gripper = np.asarray([0] * 16)
@@ -61,7 +60,9 @@ class Primitive(State):
         self.goal = goal
         self.q_start = self.C.getJointState()
         self.start_config = self.C.getFrameState()
-        print(self.goal)
+        # need to find out if we need overhead
+        self.needs_overhead_start = self.min_overhead > self.C.frame(gripper).getPosition()[2]
+
         if not self.goal is None:
             self.initial_goal_position = self.C.frame(self.goal).getPosition()
         # get the goal configuration
@@ -70,8 +71,6 @@ class Primitive(State):
 
         self.place_counter = 0
         self.is_in_world = False
-        print(gripper)
-        self.needs_overhead_start = self.min_overhead > self.C.frame(gripper).getPosition()[2]
 
         # visualize goal config if V is set
         if self.vis:
@@ -100,7 +99,7 @@ class Primitive(State):
                     self.C.setJointState(q_via)
                     self.V.setConfiguration(self.C)
                     print("showing via point ", i)
-                    time.sleep(2)
+                    time.sleep(1)
 
             # create movements from values
             for i, (phase, bezier_profile) in enumerate(zip(phases, bezier_profiles)):
@@ -658,9 +657,9 @@ class PushToEdge(Primitive):
         # get new position
         block_size = self.C.frame(self.goal).getSize()
         xy_diag = np.sqrt(block_size[0] ** 2 + block_size[1] ** 2) / 2
-        buffer = 0.08
+        buffer = 0.05
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.positionRel, frames=[self.goal, self.gripper],
-                        target=[0, self.push_direction * (xy_diag + buffer), -0.05], scale=[1e1, 1e1, 1e0])
+                        target=[0, -self.push_direction * (xy_diag + buffer), -0.05], scale=[1e1, 1e1, 1e0])
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorZ, frames=[self.gripper],
                         target=[0, 0, 1])
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductXX, frames=[self.gripper, "world"],
@@ -697,17 +696,17 @@ class PushToEdge(Primitive):
         print("Quaternion is: ", self.C.frame(self.gripper).getQuaternion())
 
         # get the overhead for via points
-        overhead = 0.2
 
         # 1st via point
-        q_via1 = self._get_overhead_for_q(self.q_start, overhead)
+        q_via1 = self._get_overhead_for_q(self.q_start)
 
         # 2nd via point
-        q_via2 = self._get_overhead_for_q(self.q_goal, overhead)
+        q_via2 = self._get_overhead_for_q(self.q_goal)
 
         # 3rd via point (to push motion)
         # find the push distance
-        push_distance = 0.15
+        block_position_x = self.C.frame(self.goal).getPosition()[0]
+        push_distance = 1 - np.abs(block_position_x)
         self.C.setJointState(self.q_goal)
         gripper_pose_via_3 = self.C.frame(self.gripper).getPosition()
         gripper_pose_via_3[0] = gripper_pose_via_3[0] + (push_distance * self.push_direction)
@@ -723,6 +722,8 @@ class PushToEdge(Primitive):
         phases = [0.1, 0.4, 0.1, 0.4]
         bezier_profiles = ["EaseInOutSine", "EaseInOutSine", "EaseInOutSine", "EaseInOutSine"]
         q_points = [self.q_start, q_via1, q_via2, self.q_goal, q_via3]
+
+        self.check_and_remove_start_overhead(phases, q_points, bezier_profiles, new_bezier="EaseInOutSine")
 
         return phases, bezier_profiles, q_points
 
@@ -771,12 +772,12 @@ class EdgeGrasp(Primitive):
         return iK.getConfiguration(0)
 
     def _get_komo(self, move_to=None):
-        komo = self.C.komo_path(1, self.n_steps, self.duration, True)
-        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e2] * 16, order=2)
+        komo = self.C.komo_path(1, 200, self.duration, True)
+        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e1] * 16, order=2)
         komo.addObjective(time=[1.0], type=ry.OT.eq, feature=ry.FS.qItself, target=self.q_goal,
                           scale=[1e2] * 16)
-        komo.addObjective(time=[0.6, 1.0], type=ry.OT.sos, feature=ry.FS.position, frames=[self.gripper],
-                          target=[0, 0.1, 0], scale=[1e2] * 3, order=2)
+        #komo.addObjective(time=[0.6, 1.0], type=ry.OT.sos, feature=ry.FS.position, frames=[self.gripper],
+        #                  target=[0, 0.1, 0], scale=[1e2] * 3, order=2)
         komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e2])
         komo.optimize()
         return komo
@@ -784,7 +785,6 @@ class EdgeGrasp(Primitive):
     def _get_joint_interpolation(self, move_to=None):
         q_via1 = self._get_overhead_for_q(self.q_start)
 
-        # create 2nd via which is a behind the object, so we can smoothly slide to object
         self.C.setJointState(self.q_goal)
         gripper_pose_via_2 = self.C.frame(self.gripper).getPosition()
         gripper_pose_via_2[1] -= 0.2
@@ -899,6 +899,7 @@ class AngleEdgePlace(Primitive):
         # iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=self.mask_gripper)
         # we assume the object is attached to the frame of the gripper, therefore we can simply just
         # tell the goal object should have a position
+        iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=[1e1] * 16)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.position,
                         frames=[self.goal], scale=[1e2] * 3, target=tower_placement)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorZ,
@@ -908,7 +909,7 @@ class AngleEdgePlace(Primitive):
         # iK.addObjective(type=ry.OT.eq, feature=ry.FS.scalarProductYZ, frames=["world", self.goal],
         #                 target=[0], scale=[1e1])
         # no contact
-        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions)
+        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e2])
         iK.optimize()
         return iK.getConfiguration(0)
 
@@ -926,10 +927,10 @@ class AngleEdgePlace(Primitive):
         overhead = 0.2
 
         # 1st via point
-        q_via1 = self._get_overhead_for_q(self.q_start, overhead)
+        q_via1 = self._get_overhead_for_q(self.q_start, 0.5)
 
         # 2nd via point
-        q_via2 = self._get_overhead_for_q(self.q_goal, overhead)
+        q_via2 = self._get_overhead_for_q(self.q_goal)
 
         phases = [0.2, 0.6, 0.2]
         bezier_profiles = ["EaseInOutSine", "EaseInOutSine", "EaseInOutSine"]
