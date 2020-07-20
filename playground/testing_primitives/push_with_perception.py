@@ -28,7 +28,7 @@ def cheat_update_obj(obj):
 if __name__ == "__main__":
 
     # setup env and get background
-    R, S, C, V, back_frame = su.setup_env_subgoal_1()
+    R, S, C, V = setup_color_challenge_env()
     cameraFrame, fxfypxpy = setup_camera(C)  # the focal length
 
     # for moving camera at start in a circle
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     # V.setConfiguration(C)
 
     panda = TowerBuilder(C, S, V, tau)
-    num_blocks = 2
+    num_blocks = 3
     # panda.set_blocks(blocks)
 
     for t in range(10000):

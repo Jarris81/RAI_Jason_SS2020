@@ -47,22 +47,31 @@ def setup_env_subgoal_1(show_background=False):
     num_blocks = 2
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
-    side = 0.13
-    positions = [
-        [0.3, .3, 0.65 + side / 2],
-        [0.6, 0.2, 0.65 + side / 2],
-        # [0.0, -.2, 0.65+side/2],
-        # [-0.1, 0, 0.65+side/2],
-        # [0.1, 0, 0.65+side/2],
-    ]
-    for o in range(num_blocks):
-        name = "obj%i" % o
-        box = R.frame(name)
-        box.setPosition(positions[o])
-        box.setColor([1, 0, 0])
-        box.setShape(ry.ST.box, size=[side, side, side, 0.001])
-        box.setQuaternion([1, 0, 0, 0])
-        box.setContact(1)
+    # side = 0.13
+    # positions = [
+    #     [0.3, .3, 0.65 + side / 2],
+    #     [0.6, 0.2, 0.65 + side / 2],
+    #     # [0.0, -.2, 0.65+side/2],
+    #     # [-0.1, 0, 0.65+side/2],
+    #     # [0.1, 0, 0.65+side/2],
+    # ]
+    # for o in range(num_blocks):
+    #     name = "obj%i" % o
+    #     box = R.frame(name)
+    #     box.setPosition(positions[o])
+    #     box.setColor([1, 0, 0])
+    #     box.setShape(ry.ST.box, size=[side, side, side, 0.001])
+    #     box.setQuaternion([1, 0, 0, 0])
+    #     box.setContact(1)
+    box1 = R.frame("obj0")
+    box1.setShape(ry.ST.ssBox, size=[0.12, 0.08, 0.10, 0.001])
+    box1.setPosition([0.02, 0.23, 0.7])
+    box1.setContact(1)
+
+    box2 = R.frame("obj1")
+    box2.setShape(ry.ST.ssBox, size=[0.17, 0.09, 0.12, 0.001])
+    box2.setPosition([-0.35,-0.1, 0.7])
+    box2.setContact(1)
 
     C, S, V = _get_CSV(R)
 
@@ -135,11 +144,40 @@ Environment where each object has different colors, for better object recognitio
 
 
 def setup_color_challenge_env():
-    random.seed(10)
+    num_blocks = 4
+    # random.seed(10)
 
     R = ry.Config()
 
     R.addFile(join(path_to_rai, "scenarios/challenge.g"))
+
+    # positions = [
+    #     [0.02, 0.23, 0.7],
+    #     [-0.35,-0.1, 0.7],
+    #     [0.2, 0.45, 0.7],
+    #     # [0.5, .15, 0.65+side/2],
+    #     [0.0, -0.1, 0.7]
+    # ]
+    #
+    # sizes = [
+    #     [0.12, 0.08, 0.10, 0],
+    #     [0.17, 0.09, 0.12, 0],
+    #     [0.14, 0.10, 0.12, 0],
+    #     # [0.5, .15, 0.65+side/2],
+    #     [0.15, 0.20, 0.11, 0],
+    # ]
+    #
+    # color = [[0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0],
+    #          [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
+    #
+    # for i in range(num_blocks):
+    #     name = "obj%i" % i
+    #     box = R.frame(name)
+    #     box.setPosition(positions[i])
+    #     box.setColor([0, 0, 1])
+    #     box.setShape(ry.ST.ssBox, sizes[i])
+    #     box.setQuaternion([1, 0, 0, 0])
+    #     box.setContact(1)
 
     # Change color of objects depending how many objects in .g file are
     obj_count = 0
@@ -152,6 +190,7 @@ def setup_color_challenge_env():
                  [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
         name = "obj%i" % o
         R.frame(name).setColor(color[o])
+        R.frame(name).setContact(1)
 
     S = R.simulation(ry.SimulatorEngine.physx, True)
     S.addSensor("camera")
