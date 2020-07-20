@@ -3,7 +3,7 @@ import libry as ry
 import numpy as np
 import cv2 as cv
 import time
-
+import util.setup as su
 from util.setup import setup_color_challenge_env
 from util.setup import setup_camera
 
@@ -13,17 +13,22 @@ from util.perception.centroidtracker import CentroidTracker
 
 from util.transformations import quaternion_from_matrix
 from util.behavior import EdgeGrasper
+from util.behavior import TowerBuilder
 
-def cheat_update_goal(goal):
-    goal.setPosition(S.getGroundTruthPosition("obj4"))
-    goal.setShape(ry.ST.ssBox, size=S.getGroundTruthSize("obj4"))
-    goal.setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix("obj4")))
+
+def cheat_update_obj(obj):
+    C.addFrame(obj)
+    C.frame(obj).setPosition(S.getGroundTruthPosition(obj))
+    C.frame(obj).setShape(ry.ST.ssBox, size=S.getGroundTruthSize(obj))
+    C.frame(obj).setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix(obj)))
+    C.frame(obj).setContact(1)
+    return obj
 
 
 if __name__ == "__main__":
 
     # setup env and get background
-    R, S, C, V = setup_color_challenge_env()
+    R, S, C, V, back_frame = su.setup_env_subgoal_1()
     cameraFrame, fxfypxpy = setup_camera(C)  # the focal length
 
     # for moving camera at start in a circle
@@ -43,7 +48,10 @@ if __name__ == "__main__":
     # for the camera rotation
     angle = 0
     radius = 0.085
-    perception = True
+    perception = False
+
+    blocks = []
+
     # Perception part - takes 10.000
     while perception:
         t += 1
@@ -74,7 +82,7 @@ if __name__ == "__main__":
                 # now compute the average position and leght of each side and create a frame in
                 # Configuration space
                 for id, obj_info in objects.items():
-                    pt.add_comp_frame(id, objects, C)
+                    blocks.append(pt.add_comp_frame(id, objects, C))
                     V.setConfiguration(C)
                 perception = False
 
@@ -98,22 +106,33 @@ if __name__ == "__main__":
 
     # goal = C.getFrame("goal")
 
+    # behavior --> has_Goal TODO, _do_top_gras Condition anschauen und testen
 
-    goal = C.addFrame("goal")
-    goal.setContact(1)
+    # Go back to Grav COmpensation, dann entscheidet welches Ziel entschieden werden soll
+    # Check if objects are too far away
+
+    # goal = C.addFrame("goal")
+    # goal.setContact(1)
+    # goal.addAttribute("friction", 1.0)
     # cheat and set goal in config from simulation
-    cheat_update_goal(goal)
-    V.setConfiguration(C)
+    # cheat_update_goal(goal)
+    # V.setConfiguration(C)
 
-    panda = EdgeGrasper(C, S, V, tau)
+    panda = TowerBuilder(C, S, V, tau)
+    num_blocks = 2
+    # panda.set_blocks(blocks)
 
     for t in range(10000):
         time.sleep(tau)
-        if t > 100 and t % rate_camera:
-            cheat_update_goal(goal)
-            panda.set_blocks(["goal"])
+
+        # frame rate of camera, do perception here
+        if t > 100 and not t % rate_camera:
+            # set blocks in config and add
+            panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
 
         panda.step(t)
+    print("Simulation is done")
+    time.sleep(5)
     # TODO: decide on goal from the frames
 
     # TODO decide on Grasp - also add perception stuff. Maybe check object position with the last object IDs?

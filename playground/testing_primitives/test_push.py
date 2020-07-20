@@ -1,23 +1,9 @@
-import sys
-import cv2 as cv
 import libry as ry
-from util.setup import setup_challenge_env
 from util.setup import setup_camera
 from util.setup import setup_env_test_edge_grasp
 from util.transformations import quaternion_from_matrix
-import util.perception as perc
-import util.geom as geom
-import numpy as np
 import time
-from util.planner import check_if_goal_constant
-import util.primitive as grasp
-import util.transformations as _tf
-from util.planner import set_goal_ball
-import util.primitive as prim
-from util.behavior import GrabAndLift
-from util.behavior import EdgeGrasper
-from transitions import Machine
-from functools import partial
+from util.perception.behavior import EdgeGrasper
 
 
 def cheat_update_goal(goal):

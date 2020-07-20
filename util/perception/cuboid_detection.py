@@ -94,10 +94,11 @@ def mask_colored_object(hsv_colors, rgb):
                 if (cX, cY) in center_points:
                     break
             else:
-                cX, cY = 0, 0
+                return []
 
             obj_dict["center"] = (cX, cY)
             obj_dict["obj_color"] = cv.cvtColor(np.uint8([[[hsv[0], hsv[1], hsv[2]]]]), cv.COLOR_HSV2BGR)[0][0]
+            #obj_dict["obj_color"] = hsv
             obj_info.append(obj_dict.copy())
 
     return obj_info
@@ -171,9 +172,10 @@ def detectCuboids(S, camera, fxfypxpy, rgb, depth, objects, id):
 
     # get edges inside the colored object
     # canny edge detection
-    edges = cv.Canny(masked_image, 15, 35)
-    edges = cv.dilate(edges, None, iterations=1)
-    edges = cv.erode(edges, None, iterations=1)
+    edges = cv.Canny(masked_image, 15, 25)
+    kernel = np.ones((3, 3), np.uint8)
+    edges = cv.dilate(edges, kernel, iterations=1)
+    edges = cv.erode(edges, kernel, iterations=1)
 
     # find contours in edges - hopefully the rectangle sides
     contours, hierarchy = cv.findContours(edges, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
@@ -359,17 +361,14 @@ def add_comp_frame(id, objects, C):
     pos = remove_outliers(np.array(objects[id]["pos"]))
     pos_est = np.mean(pos, axis=0)
 
-    if id == 4:
-        pass
-    else:
-        obj = C.addFrame("obj" + str(id))
-        obj.setColor(objects[id]["obj_color"])
-        obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.01])
-        obj.setPosition([pos_est[0], pos_est[1], pos_est[2]])
-        obj.setMass(0.2)
-        obj.setContact(1)
-        print(objects[id]["obj_color"])
+    obj = C.addFrame("obj" + str(id))
+    obj.setColor(objects[id]["obj_color"])
+    obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.0])
+    obj.setPosition([pos_est[0], pos_est[1], pos_est[2]])
+    obj.setMass(0.2)
+    obj.setContact(1)
 
+    return obj
 
 # numpy.median is rather slow, let's build our own instead
 def median(x):

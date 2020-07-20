@@ -1,21 +1,11 @@
-import sys
-import cv2 as cv
-import libry as ry
 from util.setup import setup_challenge_env
 from util.setup import setup_camera
 import util.perception as perc
 import util.geom as geom
-import numpy as np
 import time
 from util.planner import check_if_goal_constant
-import util.primitive as grasp
-import util.transformations as _tf
 from util.planner import set_goal_ball
-import util.primitive as prim
-from util.behavior import GrabAndLift
-from util.behavior import PickAndPlace
-from transitions import Machine
-from functools import partial
+from util.perception.behavior import PickAndPlace
 
 pathRepo = '/home/jason/git/robotics-course/'
 
