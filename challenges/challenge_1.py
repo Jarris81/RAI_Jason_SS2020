@@ -5,8 +5,6 @@ import time
 from util.behavior import TowerBuilder
 from util.transformations import quaternion_from_matrix
 
-pathRepo = '/home/jason/git/robotics-course/'
-
 """
 Short example for testing the transition library, 
 and building a state machine for the different primitives

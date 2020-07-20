@@ -2,8 +2,7 @@ import random
 import libry as ry
 import util.perception as perc
 from os.path import join
-
-pathRepo = '/home/nika/git/robotics-course'
+from util.path_to_repo import path_to_rai
 
 
 def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=False):
@@ -17,7 +16,7 @@ def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=F
     back_frame = None
 
     R = ry.Config()
-    R.addFile(join(pathRepo, "scenarios/challenge.g"))
+    R.addFile(join(path_to_rai, "scenarios/challenge.g"))
 
     if add_red_ball:
         # only add 1 red ball
@@ -140,7 +139,7 @@ def setup_color_challenge_env():
 
     R = ry.Config()
 
-    R.addFile(join(pathRepo, "scenarios/challenge.g"))
+    R.addFile(join(path_to_rai, "scenarios/challenge.g"))
 
     # Change color of objects depending how many objects in .g file are
     obj_count = 0
@@ -158,7 +157,7 @@ def setup_color_challenge_env():
     S.addSensor("camera")
 
     C = ry.Config()
-    C.addFile(join(pathRepo, 'scenarios/pandasTable.g'))
+    C.addFile(join(path_to_rai, 'scenarios/pandasTable.g'))
     V = ry.ConfigurationViewer()
     V.setConfiguration(C)
 
@@ -195,7 +194,7 @@ def _get_CSV(R):
     S = R.simulation(ry.SimulatorEngine.physx, True)
     S.addSensor("camera")
     C = ry.Config()
-    C.addFile(join(pathRepo, "scenarios/pandasTable.g"))
+    C.addFile(join(path_to_rai, "scenarios/pandasTable.g"))
     V = ry.ConfigurationViewer()
     V.setConfiguration(C)
     return C, S, V

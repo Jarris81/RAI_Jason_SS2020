@@ -7,7 +7,6 @@ from util.setup import setup_camera
 from util.setup import setup_env_subgoal_3
 from util.transformations import quaternion_from_matrix
 
-pathRepo = '/home/nika/git/robotics-course/'
 
 """
 Short example for testing the transition library, 
