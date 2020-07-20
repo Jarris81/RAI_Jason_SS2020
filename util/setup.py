@@ -84,18 +84,18 @@ def setup_env_subgoal_2(show_background=False):
 
     side = 0.13
     positions = [
-        [0.3, .3, 0.65 + side / 2],
-        [-0.1, .2, 0.65 + side / 2],
-        [-0.2, -.1, 0.65 + side / 2],
-        [0.5, .15, 0.65 + side / 2],
-        [0.6, 0.3, 0.65 + side / 2],
+        [0.3, .3, 0.7 + side / 2],
+        [-0.1, .2, 0.7 + side / 2],
+        [-0.2, -.1, 0.7 + side / 2],
+        [0.5, .15, 0.7 + side / 2],
+        [0.6, 0.3, 0.7 + side / 2],
     ]
     for i, o in enumerate(range(num_blocks)):
         name = "obj%i" % o
         box = R.frame(name)
         box.setPosition(positions[o])
         box.setColor([1, 0, 0])
-        box.setShape(ry.ST.ssBox, size=[side - i * 0.01, side - i * 0.01, side - i * 0.01, 0.])
+        box.setShape(ry.ST.box, size=[side - i * 0.01, side - i * 0.01, side - i * 0.01])
         box.setQuaternion([1, 0, 0, 0])
         box.setContact(1)
 

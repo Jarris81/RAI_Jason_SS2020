@@ -1,6 +1,8 @@
 import util.primitive as prim
+import util.constants as const
 from transitions import Machine
 from util.tower import Tower
+
 import libry as ry
 import copy
 from functools import partial
@@ -71,14 +73,15 @@ class TowerBuilder:
 
         # primitives
         self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 1000, interpolation=True, vis=False)
-        self.top_place = prim.TopPlace(C, S, V, tau, 1000, interpolation=True, vis=False)
-        self.pull_in = prim.PullIn(C, S, V, tau, 200, interpolation=True, vis=False)
-        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 600, interpolation=True, vis=False)
-        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 500, interpolation=True, vis=False)
-        self.edge_place = prim.EdgePlace(C, S, V, tau, 300, interpolation=False, vis=True)
-        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 500, interpolation=True, vis=False)
-        self.drop = prim.Drop(C, S, V, tau, 150, interpolation=True, vis=False)
+        self.reset = prim.Reset(C, S, V, tau, 1000, komo=False, vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 1000, komo=False, vis=False)
+        self.top_place = prim.TopPlace(C, S, V, tau, 1000, komo=False, vis=False)
+        self.pull_in = prim.PullIn(C, S, V, tau, 200, komo=False, vis=False)
+        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 600, komo=False, vis=False)
+        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 500, komo=False, vis=False)
+        self.edge_place = prim.EdgePlace(C, S, V, tau, 300, komo=False, vis=True)
+        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 500, komo=False, vis=False)
+        self.drop = prim.Drop(C, S, V, tau, 150, komo=False, vis=False)
 
         # functions
         self.tau = tau
@@ -86,7 +89,8 @@ class TowerBuilder:
         self.state = None
         self.t = 0
         self.goal = None
-        self.gripper = "R_gripper"
+        self.active_gripper = None
+        self.next_gripper = None
 
         self.C = C
         self.V = V
@@ -95,15 +99,24 @@ class TowerBuilder:
         self.tower = Tower(C, V, [0.0, -0.3, .7])
 
         # define list of states
-        self.states = [self.grav_comp, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop, self.drop]
+        self.states = [self.grav_comp, self.reset, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop,
+                       self.drop]
 
         # create finite state machine
         self.fsm = Machine(states=self.states, initial=self.grav_comp,
                            auto_transitions=False, after_state_change=self.init_state)
-        # add all transitions
+        # RESET
+        self.fsm.add_transition("reset", source=self.grav_comp, dest=self.reset,
+                                conditions=[self._gripper_changed])
+        self.fsm.add_transition("reset_done", source=self.reset, dest=self.grav_comp,
+                                conditions=[self._is_done], after=self._set_new_gripper)
+
+        # TOP GRASP
         self.fsm.add_transition("do_top_grasp", source=self.grav_comp, dest=self.top_grasp,
                                 conditions=[self._has_Goal, self._do_top_grasp])
-        # edge grasp
+        self.fsm.add_transition("do_top_place", source=self.top_grasp, dest=self.top_place,
+                                conditions=self._is_grasping)
+        # EDGE GRASP
         self.fsm.add_transition("do_edge_grasp", source=self.grav_comp, dest=self.edge_grasp,
                                 conditions=[self._has_Goal, self._do_edge_grasp])
         self.fsm.add_transition("do_edge_drop", source=self.edge_grasp, dest=self.edge_drop,
@@ -112,19 +125,20 @@ class TowerBuilder:
                                 conditions=[self._is_open])
         self.fsm.add_transition("do_edge_drop", source=self.edge_grasp, dest=self.edge_drop,
                                 conditions=[self._is_grasping])
-        self.fsm.add_transition("is_done", source=self.top_grasp, dest=self.top_place, conditions=self._is_grasping)
+
         # transitions returning to grav comp
-        self.fsm.add_transition("is_done_dropping", source=[self.drop, self.top_place], dest=self.grav_comp,
+        self.fsm.add_transition("is_done_placing", source=[self.drop, self.top_place], dest=self.grav_comp,
                                 conditions=self._is_done, after=self.place_goal_in_tower)
         self.init_state()
 
         self.cheat = True
 
     def init_state(self):
-        print("inting new state")
+        print("----- Initiating new State -----")
         print(self.fsm.state)
-        self.fsm.get_state(self.fsm.state).create_primitive(self.t, gripper=self.gripper, goal=self.goal,
+        self.fsm.get_state(self.fsm.state).create_primitive(self.t, gripper=self.active_gripper, goal=self.goal,
                                                             move_to=self.tower.get_placement())
+        self.fsm.get_state(self.fsm.state).set_min_overhead(self.tower.get_placement()[2] + 0.01)
 
     def step(self, t):
         self.t = t
@@ -137,6 +151,12 @@ class TowerBuilder:
                 break  # leave loop when trigger was made
         # make a step with the current state
         self.fsm.get_state(self.fsm.state).step(self.t)
+
+    def _gripper_changed(self):
+        return self.next_gripper is not self.active_gripper
+
+    def _set_new_gripper(self):
+        self.active_gripper = self.next_gripper
 
     def _is_grasping(self):
         return self.fsm.get_state(self.fsm.state).is_grasping()
@@ -167,9 +187,15 @@ class TowerBuilder:
         self.goal = unplaced_blocks[0]
         goal_posx = self.C.frame(self.goal).getPosition()[0]
         if goal_posx <= 0:
-            self.gripper = "L_gripper"
+            self.next_gripper = const.PANDA_L_GRIPPER
         else:
-            self.gripper = "R_gripper"
+            self.next_gripper = const.PANDA_R_GRIPPER
+        # check if we need to reset first
+        if self.active_gripper is None:
+            self.active_gripper = self.next_gripper
+            return True
+        if self.active_gripper is not self.next_gripper:
+            return False
         return True
 
     def place_goal_in_tower(self):
@@ -232,7 +258,6 @@ class TowerBuilder:
         table_right_edge_xy_limit = np.array([0.85, 0.08, 1.0, 0.12])
         table_left_edge_xy_limit = np.array([-0.85, 0.08, -1.0, 0.12])
         # check if block is located at edge
-        # check if height of block is small enough
         goal_position = self.C.frame(self.goal).getPosition()
         is_right_edge = np.all(table_right_edge_xy_limit[:2] < goal_position[:2]) and \
                         np.all(goal_position[:2] < table_right_edge_xy_limit[2:])
@@ -256,12 +281,12 @@ class EdgeGrasper(TowerBuilder):
     def __init__(self, C, S, V, tau):
         # add all states
         self.grav_comp = prim.GravComp(C, S, V, tau, 1000, vis=False)
-        self.pull_in = prim.PullIn(C, S, V, tau, 200, interpolation=True, vis=False)
-        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 600, interpolation=True, vis=False)
-        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 400, interpolation=True, vis=False)
-        self.edge_place = prim.EdgePlace(C, S, V, tau, 300, interpolation=False, vis=True)
-        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 300, interpolation=True, vis=False)
-        self.reset = prim.Drop(C, S, V, tau, 150, interpolation=True, vis=False)
+        self.pull_in = prim.PullIn(C, S, V, tau, 200, komo=False, vis=False)
+        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 600, komo=False, vis=False)
+        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 400, komo=False, vis=False)
+        self.edge_place = prim.EdgePlace(C, S, V, tau, 300, komo=False, vis=True)
+        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 300, komo=False, vis=False)
+        self.reset = prim.Drop(C, S, V, tau, 150, komo=False, vis=False)
         self.tau = tau
         self.name = "Panda"
         self.state = None

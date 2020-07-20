@@ -12,7 +12,7 @@ class Primitive(State):
 
     def __init__(self, name, C, S, V, tau, n_steps,
                  grasping=False, holding=False, placing=False,
-                 interpolation=False, vis=False):
+                 komo=False, vis=False):
 
         State.__init__(self, name)
         self.duration = tau * n_steps
@@ -25,13 +25,13 @@ class Primitive(State):
         self.holding = holding
         self.placing = placing
         self.vis = vis
-        self.use_interpolation = interpolation
+        self.use_komo = komo
         self.max_place_counter = 20
         self.min_overhead = const.MIN_OVERHEAD
 
 
         # mask to make sure the fingers do not change
-        self.mask_gripper = [0] * 16
+        self.mask_gripper = np.asarray([0] * 16)
         self.mask_gripper[-1] = 1
         self.mask_gripper[7] = 1
 
@@ -56,7 +56,6 @@ class Primitive(State):
         self.needs_overhead_start = None
 
     def create_primitive(self, t_start, gripper, goal, move_to=None):
-        print("creating new primitive!")
         self.t_start = t_start
         self.gripper = gripper
         self.goal = goal
@@ -71,7 +70,7 @@ class Primitive(State):
 
         self.place_counter = 0
         self.is_in_world = False
-
+        print(gripper)
         self.needs_overhead_start = self.min_overhead > self.C.frame(gripper).getPosition()[2]
 
         # visualize goal config if V is set
@@ -82,7 +81,17 @@ class Primitive(State):
         # reset initial config in configuration space
         self.q_goal = self.C.getJointState()
         self.C.setFrameState(self.start_config)
-        if self.use_interpolation:
+        if self.use_komo:
+            # get the komo path for the primitive and optimize
+            self.komo = self._get_komo(move_to)
+            self.komo.optimize(False)
+            # visualize komo path if V is set
+            if self.vis:
+                V2 = self.komo.view()
+                time.sleep(2)
+                V2.playVideo()
+                time.sleep(2)
+        else:
             self.q_values = []
             phases, bezier_profiles, q_points = self._get_joint_interpolation(move_to=move_to)
             # show via points
@@ -103,16 +112,8 @@ class Primitive(State):
                 # return list of values
                 self.q_values.extend([q_points[i] + delta * bezier.solve(t) for t in steps])
 
-        else:
-            # get the komo path for the primitive and optimize
-            self.komo = self._get_komo(move_to)
-            self.komo.optimize(False)
-            # visualize komo path if V is set
-            if self.vis:
-                V2 = self.komo.view()
-                time.sleep(2)
-                V2.playVideo()
-                time.sleep(2)
+    def set_min_overhead(self, min_overhead):
+        self.min_overhead = min_overhead
 
     def _get_goal_config(self, move_to=None):
         print("Method: :get_goal_config not implemented for Primtive: ", __name__)
@@ -185,12 +186,12 @@ class Primitive(State):
         """
         i = t - self.t_start
         if i < self.n_steps:
-            if self.use_interpolation:
-                q = self.q_values[i]
-                self.C.setJointState(q)
-            else:
+            if self.use_komo:
                 self.C.setFrameState(self.komo.getConfiguration(i))
                 q = self.C.getJointState()
+            else:
+                q = self.q_values[i]
+                self.C.setJointState(q)
             self.S.step(q, self.tau, ry.ControlMode.position)
         elif self.grasping:
             self.S.closeGripper(self.gripper, speed=1.0)
@@ -209,7 +210,7 @@ class Primitive(State):
             self.S.step([], self.tau, ry.ControlMode.none)
         else:
             print("this condition should really not happen, did you forget to define a transition?")
-        if not t % 10:
+        if not t % 50:
             self.V.setConfiguration(self.C)
 
 
@@ -245,10 +246,47 @@ class GravComp(Primitive):
         return False
 
 
-class Drop(Primitive):
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
+class Reset(Primitive):
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
         Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
-                           grasping=False, holding=False, placing=False, interpolation=interpolation, vis=vis)
+                           grasping=False, holding=False, placing=False, komo=komo, vis=vis)
+
+    def _get_goal_config(self, move_to=None):
+        iK = self.C.komo_IK(False)
+
+        q_reset = np.array([0., -1.,  0., -2.,  0.,  2.,  0.,  0.,  0., -1.,  0., -2.,  0.,  2.,  0.,  0.])
+        # no contact
+        iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=1e1*self.mask_gripper)
+        iK.addObjective(type=ry.OT.eq, feature=ry.qItself, target=q_reset, scale=[1e1]*len(q_reset))
+        iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e3])
+        iK.optimize()
+
+        return iK.getConfiguration(0)
+
+    def _get_komo(self, move_to=None):
+        komo = self.C.komo_path(1, self.n_steps, self.duration, True)
+        komo.addObjective(time=[], type=ry.OT.sos, feature=ry.FS.qItself, scale=[1e2] * 16, order=2)
+        komo.addObjective(time=[1.0], type=ry.OT.eq, feature=ry.FS.qItself, target=self.q_goal,
+                          scale=[1e2] * 16)
+        komo.addObjective(time=[], type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e2])
+        # seems to have no effect
+        komo.optimize()
+        return komo
+
+    def _get_joint_interpolation(self, move_to=None):
+
+        q_via1 = self._get_overhead_for_q(self.q_start, overhead=0.2)
+
+        phases = [0.3, 0.7]
+        bezier_profiles = ["EaseInSine", "EaseOutSine"]
+        q_points = [self.q_start, q_via1, self.q_goal]
+        return phases, bezier_profiles, q_points
+
+
+class Drop(Primitive):
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
+                           grasping=False, holding=False, placing=False, komo=komo, vis=vis)
 
     def _get_goal_config(self, move_to=None):
         iK = self.C.komo_IK(False)
@@ -290,21 +328,6 @@ class Drop(Primitive):
         return komo
 
     def _get_joint_interpolation(self, move_to=None):
-        # get 1 via point, for turning
-        # self.C.setJointState(self.q_start)
-        # gripper_start_pos = self.C.frame(self.gripper).getPosition()
-        # gripper_start_pos[2] += 0.0
-        # iK = self.C.komo_IK(False)
-        # iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start)
-        # iK.addObjective(type=ry.OT.eq, feature=ry.FS.position, frames=[self.gripper],
-        #                 target=gripper_start_pos, scale=[1e1]*3)
-        # iK.addObjective(type=ry.OT.sos, feature=ry.vectorZ, frames=[self.gripper],
-        #                 target=[0, 0, 1], scale=[1e1])
-        # iK.addObjective(type=ry.OT.sos, feature=ry.FS.distance, frames=[self.goal, self.gripper])
-        # iK.addObjective(type=ry.OT.ineq, feature=ry.FS.accumulatedCollisions, scale=[1e3])
-        # iK.optimize()
-        # self.C.setFrameState(iK.getConfiguration(0))
-        # q_via1 = self.C.getJointState()
 
         phases = [1.0]
         bezier_profiles = ["EaseInSine"]
@@ -314,10 +337,10 @@ class Drop(Primitive):
 
 class TopGrasp(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
 
         Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
-                           grasping=True, holding=False, placing=False, interpolation=interpolation, vis=vis)
+                           grasping=True, holding=False, placing=False, komo=komo, vis=vis)
 
     def _get_goal_config(self, move_to=None):
         block_size = self.C.frame(self.goal).getSize()
@@ -380,22 +403,22 @@ class TopGrasp(Primitive):
 
 class TopPlace(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
         Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
-                           grasping=False, holding=False, placing=True, interpolation=interpolation, vis=vis)
+                           grasping=False, holding=False, placing=True, komo=komo, vis=vis)
 
     def _get_goal_config(self, move_to=None):
         # get current joint state
         iK = self.C.komo_IK(False)
         block_size = self.C.frame(self.goal).getSize()
         tower_placment = move_to
-        tower_placment[2] = tower_placment[2] + block_size[2] / 2
+        tower_placment[2] = tower_placment[2] + (block_size[2] / 4) # really should only be half, but 4 works better
         iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=self.mask_gripper)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorX, frames=[self.gripper], target=[0, 1, 0])
         # we assume the object is attached to the frame of the gripper, therefore we can simply just
         # tell the goal object should have a position
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.position,
-                        frames=[self.goal], scale=[1e1] * 3, target=tower_placment)
+                        frames=[self.goal], scale=[1e2] * 3, target=tower_placment)
         # z-axis of gripper should align in z-axis of world frame
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorZ, frames=[self.gripper], target=[0, 0, 1])
         # no contact
@@ -544,8 +567,8 @@ class LiftUp(Primitive):
 
 class PullIn(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
-        Primitive.__init__(self, "pull_in", C, S, V, tau, n_steps, interpolation=interpolation,
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
                            grasping=False, holding=False, placing=False, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -614,9 +637,9 @@ class PullIn(Primitive):
 
 class PushToEdge(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
-        Primitive.__init__(self, "push_edge", C, S, V, tau, n_steps,
-                           grasping=False, holding=False, placing=False, interpolation=interpolation, vis=vis)
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps,
+                           grasping=False, holding=False, placing=False, komo=komo, vis=vis)
 
         self.push_direction = 0
 
@@ -706,8 +729,8 @@ class PushToEdge(Primitive):
 
 class EdgeGrasp(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, interpolation=interpolation,
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
                            grasping=True, holding=False, placing=False, vis=vis)
         self.push_direction = 0
 
@@ -784,8 +807,8 @@ class EdgeGrasp(Primitive):
 
 class EdgePlace(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, interpolation=interpolation,
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
                            grasping=False, holding=False, placing=True, vis=vis)
 
     def _get_goal_config(self, move_to=None):
@@ -863,8 +886,8 @@ class EdgePlace(Primitive):
 
 class AngleEdgePlace(Primitive):
 
-    def __init__(self, C, S, V, tau, n_steps, interpolation=False, vis=False):
-        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, interpolation=interpolation,
+    def __init__(self, C, S, V, tau, n_steps, komo=False, vis=False):
+        Primitive.__init__(self, __class__.__name__, C, S, V, tau, n_steps, komo=komo,
                            grasping=False, holding=False, placing=True, vis=vis)
 
     def _get_goal_config(self, move_to=None):

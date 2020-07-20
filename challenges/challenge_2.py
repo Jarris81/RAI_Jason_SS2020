@@ -17,7 +17,7 @@ and building a state machine for the different primitives
 def cheat_update_obj(obj):
     C.addFrame(obj)
     C.frame(obj).setPosition(S.getGroundTruthPosition(obj))
-    C.frame(obj).setShape(ry.ST.ssBox, size=S.getGroundTruthSize(obj))
+    C.frame(obj).setShape(ry.ST.box, size=S.getGroundTruthSize(obj))
     C.frame(obj).setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix(obj)))
     C.frame(obj).setContact(1)
     return obj
