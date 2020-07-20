@@ -168,6 +168,12 @@ class TowerBuilder:
 
         # get the first in list
         self.goal = unplaced_blocks[0]
+        goal_posx = self.C.frame(self.goal).getPosition()[0]
+        if goal_posx <= 0:
+            self.gripper = "L_gripper"
+        else:
+            self.gripper = "R_gripper"
+
         #print(f"New Goal is : {self.goal}!")
         return True
 
