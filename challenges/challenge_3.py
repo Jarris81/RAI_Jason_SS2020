@@ -7,7 +7,6 @@ from util.setup import setup_camera
 from util.setup import setup_env_subgoal_3
 from util.transformations import quaternion_from_matrix
 
-
 """
 Short example for testing the transition library, 
 and building a state machine for the different primitives
@@ -28,7 +27,7 @@ if __name__ == "__main__":
     # setup env and get background
     R, S, C, V, back_frame = setup_env_subgoal_3(False)
     cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
-    tau = .01
+    tau = .001
     rate_camera = 10
 
     state = 0

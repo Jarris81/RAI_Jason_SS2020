@@ -2,6 +2,7 @@ import libry as ry
 from util.setup import setup_env_subgoal_1
 from util.setup import setup_camera
 import time
+
 from util.behavior import TowerBuilder
 from util.transformations import quaternion_from_matrix
 

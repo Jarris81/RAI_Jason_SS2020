@@ -216,6 +216,7 @@ def setup_env_test_edge_grasp(show_background=False):
     width = 0.3
     length = width
     position = [0.9, 0.1, 0.65 + height / 2]
+
     box = R.frame("obj0")
     box.setPosition(position)
     box.setColor([1, 0, 0])

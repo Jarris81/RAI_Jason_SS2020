@@ -173,8 +173,6 @@ class TowerBuilder:
             self.gripper = "L_gripper"
         else:
             self.gripper = "R_gripper"
-
-        #print(f"New Goal is : {self.goal}!")
         return True
 
     def place_goal_in_tower(self):

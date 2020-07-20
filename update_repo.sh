@@ -4,5 +4,5 @@ cd /home/jason/git/robotics-course
 git pull
 git submodule update 
 cd build
-cmake .. -DPYTHON_EXECUTABLE=/home/jason/anaconda3/envs/rai/bin/python -DPYTHON_LIBRARY=/home/jason/anaconda3/envs/rai/lib/libpython3.8.so
+cmake .. -DPYTHON_EXECUTABLE=/home/jason/anaconda3/envs/rai/bin/python -DPYTHON_LIBRARY=/home/jason/anaconda3/envs/rai/lib/libpython3.6m.so
 make -j4
