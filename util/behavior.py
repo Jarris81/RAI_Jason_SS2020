@@ -7,7 +7,6 @@ from functools import partial
 from guppy import hpy
 import numpy as np
 
-
 #
 MAX_DISTANCE_TOP_GRASP = 1.0  # 1
 MAX_GRIPPER_WIDTH = 0.2
@@ -53,8 +52,6 @@ class GrabAndLift:
 
         # make a step with the current state
         self.fsm.get_state(self.state).step(self.t)
-
-
 
     def _is_grasping(self):
         return self.fsm.get_state(self.state).is_grasping()
@@ -127,7 +124,7 @@ class TowerBuilder:
         print("inting new state")
         print(self.fsm.state)
         self.fsm.get_state(self.fsm.state).create_primitive(self.t, gripper=self.gripper, goal=self.goal,
-                                                        move_to=self.tower.get_placement())
+                                                            move_to=self.tower.get_placement())
 
     def step(self, t):
         self.t = t
@@ -215,8 +212,6 @@ class TowerBuilder:
         if not self.goal:
             return False
 
-        # TODO check if block is not too far away
-
         # check if length or width of block is smaller than gripper
         goal_size = self.C.frame(self.goal).getSize()
         if np.all(goal_size[:2] > MAX_GRIPPER_WIDTH):
@@ -233,14 +228,18 @@ class TowerBuilder:
         # check if we have a goal
         if not self.goal:
             return False
-
+        # TODO check if block is not too far away
         table_right_edge_xy_limit = np.array([0.85, 0.08, 1.0, 0.12])
+        table_left_edge_xy_limit = np.array([-0.85, 0.08, -1.0, 0.12])
         # check if block is located at edge
         # check if height of block is small enough
         goal_position = self.C.frame(self.goal).getPosition()
+        is_right_edge = np.all(table_right_edge_xy_limit[:2] < goal_position[:2]) and \
+                        np.all(goal_position[:2] < table_right_edge_xy_limit[2:])
+        is_left_edge = np.all(table_left_edge_xy_limit[:2] < goal_position[:2]) and \
+                       np.all(goal_position[:2] < table_left_edge_xy_limit[2:])
         # check if lower and upper limit is ok
-        if not np.all(table_right_edge_xy_limit[:2] < goal_position[:2]) and \
-                not np.all(goal_position[:2] < table_right_edge_xy_limit[2:]):
+        if not is_left_edge and not is_right_edge:
             return False
 
         # check if height of block is small enough
@@ -289,7 +288,7 @@ class EdgeGrasper(TowerBuilder):
         self.fsm.add_transition("edge_grasp", source=self.push_to_edge, dest=self.edge_grasp, conditions=self._is_done)
         self.fsm.add_transition("edge_place", source=self.edge_grasp, dest=self.edge_drop, conditions=self._is_grasping)
         self.fsm.add_transition("is_done", source=[self.edge_place], dest=self.grav_comp,
-                                conditions=self._is_open,  before=self.place_goal_in_tower)
+                                conditions=self._is_open, before=self.place_goal_in_tower)
         self.fsm.add_transition("reset", source=self.edge_drop, dest=self.reset,
                                 conditions=self._is_open)
         self.fsm.add_transition("is_done_dropping", source=[self.reset], dest=self.grav_comp,
@@ -297,5 +296,3 @@ class EdgeGrasper(TowerBuilder):
         self.init_state()
 
         self.cheat = True
-
-
