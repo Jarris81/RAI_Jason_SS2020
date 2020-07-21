@@ -2,7 +2,7 @@ import random
 import libry as ry
 import util.perception as perc
 from os.path import join
-from util.path_to_rai_repo import path_to_rai
+from util.path_to_repo import path_to_rai
 
 
 def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=False):
@@ -186,7 +186,7 @@ def setup_color_challenge_env():
             obj_count += 1
 
     for o in range(0, obj_count):
-        color = [[0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0],
+        color = [[0, 1, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0],
                  [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
         name = "obj%i" % o
         R.frame(name).setColor(color[o])
