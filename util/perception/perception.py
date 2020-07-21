@@ -16,6 +16,7 @@ class Perception():
         self.C = C
         self.V = V
         self.camera = camera
+        self.cam_quat = []
         self.fxfypxpy = fxfypxpy
         self.rate_camera = 10
 
@@ -27,6 +28,7 @@ class Perception():
         self.seen_obj = None
 
         self.computed_blocks = []
+        self.runs = True
 
     def step(self, t):
         if t % self.rate_camera == 0:
@@ -57,7 +59,7 @@ class Perception():
                 for id, obj_info in self.objects.items():
                     self.computed_blocks.append(self.add_comp_frame(id))
                     self.V.setConfiguration(self.C)
-                perception = False
+                self.runs = False
 
             for (objectID, obj_info) in self.objects.items():
                 centroid = obj_info["center"]
@@ -77,6 +79,8 @@ class Perception():
                 self.V = 0
 
         self.S.step([], 0.01, ry.ControlMode.none)
+
+        return self.runs
 
     def move_camera(self, t):
         """
@@ -108,6 +112,12 @@ class Perception():
         self.camera.setQuaternion([quat_new[0], quat_new[1], quat_new[2], quat_new[3]])
         self.angle += 0.0872665
 
+        if t == 11000:
+            self.camera.setPosition([0, -.75, 1.85])
+            self.camera.setQuaternion(self.cam_quat)
+            self.angle = 0
+            self.radius = 0.075
+
     def init_get_real_colors(self):
         names = self.R.getFrameNames()
         for name in names:
@@ -121,6 +131,8 @@ class Perception():
                 self.nextObjectID += 1
 
         self.seen_obj = np.zeros(len(self.objects))
+        self.cam_quat = self.camera.getQuaternion()
+        self.cam_pos = self.camera.getPosition()
 
     def mask_colored_object(self, rgb):
         """
@@ -207,7 +219,7 @@ class Perception():
         # get edges inside the colored object
         # canny edge detection
         v = np.median(mean_image) - min(mean_image)
-        sigma = 0.15
+        sigma = 0.23
         lower = int(max(0, (1.0 - sigma) * v))
         upper = int(min(255, (1.0 + sigma) * v))
         # edges = grad_x + grad_y
@@ -231,12 +243,12 @@ class Perception():
         if len(contours) < 3:
             return
         # Grab only the innermost child components - remove contours in contours
-        inner_contours = [c[0] for c in zip(contours, hierarchy)]
-        # inner_contours = [contours[i] for i in range(len(contours)) if hierarchy[i][3] <= 0]
+        # inner_contours = [c[0] for c in zip(contours, hierarchy)]
+        inner_contours = [contours[i] for i in range(len(contours)) if hierarchy[i][3] >= 0]
+        if inner_contours:
+            # Sort Contours on the basis of their x-axis coordinates in ascending order (from left to right)
+            sorted_contours = self.sort_contours(inner_contours)
 
-        # Sort Contours on the basis of their x-axis coordinates in ascending order (from left to right)
-        sorted_contours = self.sort_contours(inner_contours)
-        if sorted_contours:
             # cv.drawContours(rgb, sorted_contours, -1, (255, 0, 0), 1)
             for cnt in sorted_contours:
 
@@ -268,7 +280,7 @@ class Perception():
                     founded_sides.append(corner_points_ordered)
                     number_of_sides_found += 1
 
-                    cv.drawContours(rgb, cnt, -1, (0, 0, 0), 2)
+                    cv.drawContours(rgb, [hull], -1, (0, 0, 0), 2)
                     # if we found 3 "good" sides we can compute the object size and position (or try it :) )
                     if number_of_sides_found == 3:
                         self.computeObjectInfo(id, founded_sides, depth)
@@ -399,7 +411,8 @@ class Perception():
         pos = remove_outliers(np.array(self.objects[id]["pos"]))
         pos_est = np.mean(pos, axis=0)
 
-        obj = self.C.addFrame("obj" + str(id))
+        name = "obj" + str(id)
+        obj = self.C.addFrame(name)
         print(self.objects[id]["rgb_color"])
         obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.0])
         obj.setPosition([pos_est[0], pos_est[1], pos_est[2]])
@@ -407,7 +420,7 @@ class Perception():
         obj.setContact(1)
         obj.setColor(self.objects[id]["rgb_color"])
 
-        return obj
+        return name
 
     # Sort Contours on the basis of their x-axis coordinates in ascending order (from left to right)
     def sort_contours(self, contours):
@@ -457,7 +470,7 @@ def median(x):
 
 
 # main function
-def remove_outliers(data, thresh=3.0):
+def remove_outliers(data, thresh=2.0):
     m = median(data)
     s = np.abs(data - m)
     return data[(s < median(s) * thresh).all(axis=1)]

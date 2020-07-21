@@ -66,11 +66,13 @@ def setup_env_subgoal_1(show_background=False):
     box1 = R.frame("obj0")
     box1.setShape(ry.ST.ssBox, size=[0.12, 0.08, 0.10, 0.001])
     box1.setPosition([0.02, 0.23, 0.7])
+    box1.setColor([0, 1, 1])
     box1.setContact(1)
 
     box2 = R.frame("obj1")
     box2.setShape(ry.ST.ssBox, size=[0.17, 0.09, 0.12, 0.001])
     box2.setPosition([-0.35,-0.1, 0.7])
+    box2.setColor([1, 1, 0])
     box2.setContact(1)
 
     C, S, V = _get_CSV(R)
@@ -142,17 +144,20 @@ def setup_env_subgoal_4(show_background=False):
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
     s = 0.13
+    color = [[0, 1, 1], [1, 0, 1], [1, 1, 0], [0, 1, 0],
+             [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
+
     positions = [
-        [0.6, 0.05, 0.7 + 0.1 / 2],
-        [-0.6, 0.05, 0.7 + 0.1 / 2],
+        [0.35, 0.1, 0.7 + 0.1 / 2],
+        [-0.3, 0.05, 0.7 + 0.1 / 2],
         # [-0.2, -.1, 0.65+side/2],
         # [0.5, .15, 0.65+side/2],
         #[0.6, 0.3, 0.65 + 0.13 / 2]
     ]
 
     sizes = [
-        [0.3, 0.3, 0.1, 0],
-        [0.3, 0.3, 0.1, 0],
+        [0.25, 0.27, 0.1, 0],
+        [0.3, 0.25, 0.1, 0],
         # [-0.2, -.1, 0.65+side/2],
         # [0.5, .15, 0.65+side/2],
         #[0.13, 0.13, 0.13, 0.],
@@ -161,11 +166,11 @@ def setup_env_subgoal_4(show_background=False):
         name = "obj%i" % i
         box = R.frame(name)
         box.setPosition(positions[i])
-        box.setColor([1, 0, 0])
         box.setShape(ry.ST.ssBox, sizes[i])
         box.setQuaternion([1, 0, 0, 0])
         box.addAttribute("friction", 1.0)
         box.setContact(1)
+        box.setColor(color[i])
 
     C, S, V = _get_CSV(R)
 

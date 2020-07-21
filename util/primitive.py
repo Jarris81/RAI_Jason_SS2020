@@ -413,6 +413,7 @@ class TopPlace(Primitive):
         block_size = self.C.frame(self.goal).getSize()
         tower_placment = move_to
         tower_placment[2] = tower_placment[2] + (block_size[2] / 4) # really should only be half, but 4 works better
+
         iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=self.mask_gripper)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorX, frames=[self.gripper], target=[0, 1, 0])
         # we assume the object is attached to the frame of the gripper, therefore we can simply just

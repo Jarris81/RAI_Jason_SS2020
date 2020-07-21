@@ -20,7 +20,9 @@ if __name__ == "__main__":
 
     t = 0
 
-    while True:
+    while perception.runs:
         t += 1
         # time.sleep(0.01)
         perception.step(t)
+
+    perception.computed_blocks
