@@ -71,7 +71,7 @@ def setup_env_subgoal_1(show_background=False):
 
     box2 = R.frame("obj1")
     box2.setShape(ry.ST.ssBox, size=[0.17, 0.09, 0.12, 0.001])
-    box2.setPosition([-0.35,-0.1, 0.7])
+    box2.setPosition([-0.35, -0.1, 0.7])
     box2.setColor([1, 1, 0])
     box2.setContact(1)
 
@@ -142,6 +142,7 @@ def setup_env_subgoal_3(show_background=False):
 
     return R, S, C, V, back_frame
 
+
 def setup_env_subgoal_4(show_background=False):
     num_blocks = 5
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
@@ -154,8 +155,8 @@ def setup_env_subgoal_4(show_background=False):
     positions = [
         [0.6, 0.05, 0.7 + 0.1 / 2],
         [-0.6, 0.05, 0.7 + 0.1 / 2],
-        [0.1, 0.3, 0.7+0.15/2],
-        [0.5, 0.25, 0.7+0.14/2],
+        [0.1, 0.3, 0.7 + 0.15 / 2],
+        [0.5, 0.25, 0.7 + 0.14 / 2],
         [-0.6, 0.3, 0.7 + 0.13 / 2]
     ]
 
@@ -181,6 +182,7 @@ def setup_env_subgoal_4(show_background=False):
     C, S, V = _get_CSV(R)
 
     return R, S, C, V, back_frame
+
 
 """
 Environment where each object has different colors, for better object recognition in perception
