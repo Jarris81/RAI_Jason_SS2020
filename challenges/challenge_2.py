@@ -8,6 +8,9 @@ from util.setup import setup_env_subgoal_2
 from util.transformations import quaternion_from_matrix
 
 
+import util.perception.perception as pt
+
+
 """
 Short example for testing the transition library, 
 and building a state machine for the different primitives
@@ -37,17 +40,32 @@ if __name__ == "__main__":
 
     panda = TowerBuilder(C, S, V, tau)
 
+    # for moving camera at start in a circle
+    camera = R.frame("camera")
+    camera.setPosition([0, -.85, 1.85])
+
     # used for shortcutting perception
     num_blocks = 5
+    perception = pt.Perception(R, S, C, V, camera, fxfypxpy)
+    perception.init_get_real_colors()
+    perception.runs = True
 
-    for t in range(15000):
-        time.sleep(tau)
+    t = 0
 
+    while perception.runs:
+        t += 1
+        # time.sleep(0.01)
+        perception.step(t)
+
+
+
+    while True:
+        time.sleep(0.01)
+        t += 1
         # frame rate of camera, do perception here
-        if t > 100 and not t % rate_camera:
-            # set blocks in config and add
-            panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
+        if t > 100 and not t%rate_camera:
+
+            panda.set_blocks(perception.computed_blocks)
 
         panda.step(t)
-    print("Simulation is done")
     time.sleep(5)

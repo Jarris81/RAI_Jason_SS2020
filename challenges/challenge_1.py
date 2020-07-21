@@ -31,6 +31,8 @@ if __name__ == "__main__":
     rate_camera = 10
 
 
+    panda = TowerBuilder(C, S, V, tau)
+
     # for moving camera at start in a circle
     camera = R.frame("camera")
     camera.setPosition([0, -.85, 1.85])  # TODO could also set in .g file
@@ -47,11 +49,10 @@ if __name__ == "__main__":
         perception.step(t)
 
 
-    panda = TowerBuilder(C, S, V, tau)
 
-    for t in range(5000):
-        time.sleep(tau)
-
+    while True:
+        time.sleep(0.01)
+        t += 1
         # frame rate of camera, do perception here
         if t > 100 and not t%rate_camera:
 

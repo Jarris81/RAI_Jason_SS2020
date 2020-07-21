@@ -84,6 +84,9 @@ def setup_env_subgoal_2(show_background=False):
     num_blocks = 5
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
+    color = [[0, 1, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0],
+             [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
+
     side = 0.13
     positions = [
         [0.3, .3, 0.7 + side / 2],
@@ -96,10 +99,10 @@ def setup_env_subgoal_2(show_background=False):
         name = "obj%i" % o
         box = R.frame(name)
         box.setPosition(positions[o])
-        box.setColor([1, 0, 0])
         box.setShape(ry.ST.box, size=[side - i * 0.01, side - i * 0.01, side - i * 0.01])
         box.setQuaternion([1, 0, 0, 0])
         box.setContact(1)
+        box.setColor(color[i])
 
     C, S, V = _get_CSV(R)
 
