@@ -210,7 +210,8 @@ class Primitive(State):
             self.S.step([], self.tau, ry.ControlMode.none)
         elif self.placing:
             # when we are placing, the gripper will open
-            self.S.openGripper(self.gripper, speed=1.0)
+            if self.S.getGripperWidth(self.gripper) < const.MAX_GRIPPER_WIDTH:
+                self.S.openGripper(self.gripper, speed=1.0)
             # check if griper is open
             if not self.S.getGripperIsGrasping(self.gripper) and not self.is_in_world:
                 self.C.attach("world", self.goal)
