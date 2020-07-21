@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # setup env and get background
     R, S, C, V, back_frame = setup_env_subgoal_2(False)
     cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
-    tau = .001
+    tau = .01
     rate_camera = 10
 
     state = 0

@@ -37,7 +37,7 @@ if __name__ == "__main__":
     panda = TowerBuilder(C, S, V, tau)
 
     # used for shortcutting perception
-    num_blocks = 2
+    num_blocks = 5
 
     for t in range(100000):
         time.sleep(tau)

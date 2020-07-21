@@ -23,3 +23,11 @@ class Tower:
 
     def get_blocks(self):
         return self.blocks
+
+    def update(self):
+        if not len(self.blocks):
+            return
+        last_block = self.blocks[-1]
+        block_pos = self.C.frame(last_block).getPosition()
+
+        self.posXY[:2] = block_pos[:2]

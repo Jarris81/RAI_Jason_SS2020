@@ -72,16 +72,17 @@ class TowerBuilder:
         # add all states
 
         # primitives
-        self.grav_comp = prim.GravComp(C, S, V, tau, 10, vis=False)
-        self.reset = prim.Reset(C, S, V, tau, 10, komo=False, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 10, komo=False, vis=False)
-        self.top_place = prim.TopPlace(C, S, V, tau, 10, komo=False, vis=False)
-        self.pull_in = prim.PullIn(C, S, V, tau, 200, komo=False, vis=False)
-        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 5, komo=False, vis=False)
-        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 2, komo=True, vis=True)
-        self.edge_place = prim.EdgePlace(C, S, V, tau, 10, komo=False, vis=False)
-        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 10, komo=False, vis=False)
-        self.drop = prim.Drop(C, S, V, tau, 5, komo=False, vis=False)
+        self.grav_comp = prim.GravComp(C, S, V, tau, 108, vis=False)
+        self.reset = prim.Reset(C, S, V, tau, 5, komo=False, vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 3, komo=False, vis=True)
+        self.top_place = prim.TopPlace(C, S, V, tau, 3, komo=False, vis=False)
+        self.pull_in = prim.PullIn(C, S, V, tau, 2, komo=False, vis=False)
+        self.push_to_edge = prim.PushToEdge(C, S, V, tau, 3, komo=False, vis=False)
+        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 2, komo=True, vis=False)
+        self.edge_place = prim.EdgePlace(C, S, V, tau, 4, komo=False, vis=False)
+        self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 5, komo=False, vis=False)
+        self.drop = prim.Drop(C, S, V, tau, 3, komo=False, vis=False)
+        self.move_away = prim.MoveAway(C, S, V, tau, 3, komo=False, vis=False)
 
         # functions
         self.tau = tau
@@ -95,12 +96,11 @@ class TowerBuilder:
         self.C = C
         self.V = V
         self.observed_blocks = []
-
         self.tower = Tower(C, V, [0.0, -0.3, .7])
 
         # define list of states
         self.states = [self.grav_comp, self.reset, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop,
-                       self.drop, self.push_to_edge]
+                       self.drop, self.push_to_edge, self.edge_place, self.move_away]
 
         # create finite state machine
         self.fsm = Machine(states=self.states, initial=self.grav_comp,
@@ -117,41 +117,51 @@ class TowerBuilder:
         self.fsm.add_transition("do_top_place", source=self.top_grasp, dest=self.top_place,
                                 conditions=self._is_grasping)
 
-        # EDGE GRASP
+        # Primitives for EDGE GRASP
         self.fsm.add_transition("do_edge_grasp", source=self.grav_comp, dest=self.edge_grasp,
                                 conditions=[self._has_Goal, self._do_edge_grasp])
+        self.fsm.add_transition("do_edge_drop", source=self.edge_grasp, dest=self.edge_place,
+                                conditions=[self._is_grasping, self._is_not_first_block])
         self.fsm.add_transition("do_edge_drop", source=self.edge_grasp, dest=self.edge_drop,
-                                conditions=[self._is_grasping])
-        self.fsm.add_transition("do_edge_drop", source=self.edge_drop, dest=self.drop,
+                                conditions=[self._is_grasping, self._is_first_block])
+        self.fsm.add_transition("do_edge_drop", source=[self.edge_place], dest=self.move_away,
                                 conditions=[self._is_open])
-        self.fsm.add_transition("do_edge_drop", source=self.edge_grasp, dest=self.edge_drop,
-                                conditions=[self._is_grasping])
+        self.fsm.add_transition("do_edge_drop", source=[self.edge_drop], dest=self.drop,
+                                conditions=[self._is_open])
         # PUSH
         self.fsm.add_transition("do_push_to_edge", source=self.grav_comp, dest=self.push_to_edge,
                                 conditions=[self._has_Goal, self._do_push_to_edge])
         self.fsm.add_transition("done_push", source=self.push_to_edge, dest=self.grav_comp, conditions=self._is_done)
 
-        # transitions returning to grav comp
-        self.fsm.add_transition("is_done_placing", source=[self.drop, self.top_place], dest=self.grav_comp,
-                                conditions=self._is_done, after=self.place_goal_in_tower)
+        # transitions returning to grav comp after placing block
+        self.fsm.add_transition("is_done_placing", source=[self.top_place],
+                                dest=self.grav_comp, conditions=self._is_open, after=self.place_goal_in_tower)
+        self.fsm.add_transition("is_done_dropping", source=[self.drop, self.move_away],
+                                dest=self.grav_comp, conditions=self._is_done, after=self.place_goal_in_tower)
+
+        # transitions returning to grav comp, after not placing a block
+        self.fsm.add_transition("done_push", source=self.push_to_edge, dest=self.grav_comp, conditions=self._is_done)
+
+        # initiate initial state
         self.init_state()
 
         self.cheat = True
 
     def init_state(self):
         print("----- Initiating new State -----")
-        self.fsm.get_state(self.fsm.state).set_min_overhead(self.tower.get_placement()[2] + 0.3)
+        self.fsm.get_state(self.fsm.state).set_min_overhead(self.tower.get_placement()[2] + const.MIN_OVERHEAD)
         self.fsm.get_state(self.fsm.state).create_primitive(self.t, gripper=self.active_gripper, goal=self.goal,
                                                             move_to=self.tower.get_placement())
 
-
     def step(self, t):
         self.t = t
+        # update tower
+        self.tower.update()
         # get all possible triggers and do transition if condition fulfills
         for trigger in self.fsm.get_triggers(self.fsm.state):
             # leave if transition was made
-            print(trigger)
             if self.fsm.trigger(trigger):
+                print("----- Triggering transition:", trigger, " -----")
                 break  # leave loop when trigger was made
         # make a step with the current state
         self.fsm.get_state(self.fsm.state).step(self.t)
@@ -170,6 +180,12 @@ class TowerBuilder:
 
     def _is_done(self):
         return self.fsm.get_state(self.fsm.state).is_done(self.t)
+
+    def _is_first_block(self):
+        return len(self.tower.get_blocks()) == 0
+
+    def _is_not_first_block(self):
+        return not self._is_first_block()
 
     def _has_Goal(self):
         """
