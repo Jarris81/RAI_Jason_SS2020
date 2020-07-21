@@ -143,27 +143,29 @@ def setup_env_subgoal_3(show_background=False):
     return R, S, C, V, back_frame
 
 def setup_env_subgoal_4(show_background=False):
-    num_blocks = 2
+    num_blocks = 5
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
     s = 0.13
     color = [[0, 1, 1], [1, 0, 1], [1, 1, 0], [0, 1, 0],
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
 
+    s = 0.15
     positions = [
-        [0.35, 0.1, 0.7 + 0.1 / 2],
-        [-0.3, 0.05, 0.7 + 0.1 / 2],
-        # [-0.2, -.1, 0.65+side/2],
-        # [0.5, .15, 0.65+side/2],
-        #[0.6, 0.3, 0.65 + 0.13 / 2]
+        [0.6, 0.05, 0.7 + 0.1 / 2],
+        [-0.6, 0.05, 0.7 + 0.1 / 2],
+        [0.1, 0.3, 0.7+0.15/2],
+        [0.5, 0.25, 0.7+0.14/2],
+        [-0.6, 0.3, 0.7 + 0.13 / 2]
     ]
 
     sizes = [
-        [0.25, 0.27, 0.1, 0],
-        [0.3, 0.25, 0.1, 0],
-        # [-0.2, -.1, 0.65+side/2],
-        # [0.5, .15, 0.65+side/2],
-        #[0.13, 0.13, 0.13, 0.],
+        [0.3, 0.3, 0.1, 0],
+        [0.3, 0.3, 0.1, 0],
+        [0.15, 0.15, 0.15, 0],
+        [0.14, 0.14, 0.14, 0],
+        [0.13, 0.13, 0.13, 0],
+
     ]
     for i in range(num_blocks):
         name = "obj%i" % i
@@ -174,6 +176,7 @@ def setup_env_subgoal_4(show_background=False):
         box.addAttribute("friction", 1.0)
         box.setContact(1)
         box.setColor(color[i])
+        box.setMass(10000000)
 
     C, S, V = _get_CSV(R)
 
