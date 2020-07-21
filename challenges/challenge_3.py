@@ -16,7 +16,11 @@ and building a state machine for the different primitives
 def cheat_update_obj(obj):
     C.addFrame(obj)
     C.frame(obj).setPosition(S.getGroundTruthPosition(obj))
-    C.frame(obj).setShape(ry.ST.ssBox, size=S.getGroundTruthSize(obj))
+    size = S.getGroundTruthSize(obj)
+    if len(size) == 3:
+        C.frame(obj).setShape(ry.ST.box, size=size)
+    else:
+        C.frame(obj).setShape(ry.ST.ssBox, size=size)
     C.frame(obj).setQuaternion(quaternion_from_matrix(S.getGroundTruthRotationMatrix(obj)))
     C.frame(obj).setContact(1)
     return obj
@@ -43,7 +47,7 @@ if __name__ == "__main__":
         time.sleep(tau)
 
         # frame rate of camera, do perception here
-        if t > 100 and not t % rate_camera:
+        if t > 200 and not t % rate_camera:
             # set blocks in config and add
             panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
 

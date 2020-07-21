@@ -18,7 +18,7 @@ class Tower:
     def get_placement(self):
         placement = list(self.posXY)
         # sum up all blocks height
-        placement[2] = -0.03 + placement[2] + sum([self.C.frame(block).info()["size"][-2] for block in self.blocks])
+        placement[2] = placement[2] + sum([self.C.frame(block).info()["size"][2] for block in self.blocks])
         return placement
 
     def get_blocks(self):
