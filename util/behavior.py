@@ -74,7 +74,7 @@ class TowerBuilder:
         # primitives
         self.grav_comp = prim.GravComp(C, S, V, tau, 108, vis=False)
         self.reset = prim.Reset(C, S, V, tau, 5, komo=False, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 3, komo=False, vis=True)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 3, komo=False, vis=False)
         self.top_place = prim.TopPlace(C, S, V, tau, 3, komo=False, vis=False)
         self.pull_in = prim.PullIn(C, S, V, tau, 2, komo=False, vis=False)
         self.push_to_edge = prim.PushToEdge(C, S, V, tau, 3, komo=False, vis=False)
