@@ -65,12 +65,14 @@ def setup_env_subgoal_1(show_background=False):
     #     box.setContact(1)
     box1 = R.frame("obj0")
     box1.setShape(ry.ST.ssBox, size=[0.12, 0.08, 0.10, 0.001])
-    box1.setPosition([0.02, 0.23, 0.7])
+    box1.setPosition([0.02, 0.3, 0.7 + 0.05])
+    box1.setQuaternion([1, 0, 0, 0])
     box1.setContact(1)
 
     box2 = R.frame("obj1")
     box2.setShape(ry.ST.ssBox, size=[0.17, 0.09, 0.12, 0.001])
-    box2.setPosition([-0.35,-0.1, 0.7])
+    box2.setPosition([-0.35,-0.1, 0.7+0.06])
+    box2.setQuaternion([1, 0, 0, 0])
     box2.setContact(1)
 
     C, S, V = _get_CSV(R)
@@ -249,15 +251,46 @@ def setup_env_test_edge_grasp(show_background=False):
     height = 0.08
     width = 0.3
     length = width
-    position = [0.9, 0.1, 0.65 + height / 2]
+    position = [0.6, 0.3, 0.65 + height / 2]
 
     box = R.frame("obj0")
     box.setPosition(position)
-    box.setColor([1, 0, 0])
-    box.setShape(ry.ST.ssBox, size=[length, width, height, 0])
+    box.setColor([1, 1/2, 0])
+    box.setShape(ry.ST.ssBox, size=[length, width, height, 0.0001])
     box.setQuaternion([1, 0, 0, 0])
     box.addAttribute("friction", 1.0)
     box.setContact(1)
+
+    # draw areas:
+    area1 = R.addFrame("area1_edge_grasp")
+    area1.setPosition([0.9, 0, 0.60])
+    area1.setShape(ry.ST.box, size=[0.2, 0.3, 0.1])
+    area1.setQuaternion([1, 0, 0, 0])
+    area1.setColor([1, 0, 0])
+    area1.setContact(0)
+
+    area2 = R.addFrame("area2_edge_grasp")
+    area2.setPosition([-0.9, 0, 0.60])
+    area2.setShape(ry.ST.box, size=[0.2, 0.3, 0.1])
+    area2.setQuaternion([1, 0, 0, 0])
+    area2.setColor([1, 0, 0])
+    area2.setContact(0)
+
+
+    area3 = R.addFrame("area3_push_to_edge")
+    area3.setPosition([0, 0, 0.60])
+    area3.setShape(ry.ST.box, size=[1.6, 0.3, 0.1])
+    area3.setQuaternion([1, 0, 0, 0])
+    area3.setColor([0, 1, 0])
+    area3.setContact(0)
+
+    area4 = R.addFrame("area4_push_in")
+    area4.setPosition([-0, 0.35, 0.60])
+    area4.setShape(ry.ST.box, size=[2, 0.4, 0.1])
+    area4.setQuaternion([1, 0, 0, 0])
+    area4.setColor([0, 0, 1])
+    area4.setContact(0)
+
 
     C, S, V = _get_CSV(R)
 

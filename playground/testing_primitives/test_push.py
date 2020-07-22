@@ -44,7 +44,7 @@ if __name__ == "__main__":
             cheat_update_goal(goal)
             panda.set_blocks(["goal"])
 
-        panda.step(t)
+        #panda.step(t)
 
     time.sleep(10)
 
