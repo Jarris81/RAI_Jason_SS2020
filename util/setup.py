@@ -3,6 +3,7 @@ import libry as ry
 import util.perception as perc
 from os.path import join
 from util.path_to_repo import path_to_rai
+import numpy as np
 
 
 def setup_challenge_env(add_red_ball=False, number_objects=30, show_background=False):
@@ -201,7 +202,8 @@ def setup_env_subgoal_4(show_background=False):
 
     return R, S, C, V, back_frame
 
-def setup_env_max_stack(show_background=False):
+
+def setup_env_subgoal_4(show_background=False):
     num_blocks = 5
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
@@ -241,6 +243,53 @@ def setup_env_max_stack(show_background=False):
 
     return R, S, C, V, back_frame
 
+
+
+def setup_env_max_stack(show_background=False):
+    n_row = 3
+    n_col = 2
+
+    num_blocks = n_row*n_col
+
+
+    R, back_frame = setup_challenge_env(False, num_blocks*2, show_background=show_background)
+
+    color = [[0, 1, 1], [1, 0, 1], [1, 1, 0], [0, 1, 0],
+             [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]*2
+
+    side = 0.15
+    space = 0.3
+
+    positions = np.zeros((num_blocks, 3))
+
+    pos = 0
+    for i in range(n_row):
+        for j in range(n_col):
+            positions[pos, :] = np.array([0.1 + i*space, 0. + j * space, 0.7+ (side - pos * 0.005)/2])
+            pos += 1
+
+    positions2 = np.array(positions, copy=True)
+    positions2[:, 0] = -1 * positions2[:, 0]
+
+    positions = np.concatenate((positions, positions2), axis=0)
+
+    print(positions)
+
+    for i in range(num_blocks*2):
+        name = "obj%i" % i
+        box = R.frame(name)
+        box.setPosition(positions[i, :])
+
+        box.setQuaternion([1, 0, 0, 0])
+        box.setShape(ry.ST.ssBox, size=[side - i * 0.005, side - i * 0.005, side - i * 0.005, 0.001])
+        box.addAttribute("friction", 1.0)
+        box.setContact(1)
+        box.setColor(color[i])
+        box.setMass(10000000)
+
+    C, S, V = _get_CSV(R)
+
+    return R, S, C, V, back_frame
 
 """
 Environment where each object has different colors, for better object recognition in perception
@@ -290,11 +339,11 @@ def setup_color_challenge_env():
             obj_count += 1
 
     for o in range(0, obj_count):
-        color = [[0, 1, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0],
+        color = [[0, 1, 1], [1, 0, 1], [1, 1, 0], [0, 1, 0],
                  [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
         name = "obj%i" % o
-        R.frame(name).setColor(color[o])
         R.frame(name).setContact(1)
+        R.frame(name).setColor(color[o])
 
     S = R.simulation(ry.SimulatorEngine.physx, True)
     S.addSensor("camera")
