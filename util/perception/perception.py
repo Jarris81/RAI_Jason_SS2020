@@ -70,7 +70,12 @@ class Perception():
                            cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                 cv.circle(rgb, (centroid[0], centroid[1]), 3, (0, 255, 0), -1)
 
-            if len(rgb) > 0: cv.imshow('OPENCV - rgb', rgb)
+            if len(rgb) > 0:
+                cv.namedWindow("RGB Camera View With Contours",
+                               cv.WINDOW_NORMAL)  # Create window with freedom of dimensions
+                # imS = cv.resize(rgb, (960, 540))  # Resize image
+                cv.imshow("RGB Camera View With Contours", rgb)  # Show image
+
             if cv.waitKey(1) & 0xFF == ord('q'):
                 cv.destroyAllWindows()
                 self.R = 0
@@ -112,8 +117,8 @@ class Perception():
         self.camera.setQuaternion([quat_new[0], quat_new[1], quat_new[2], quat_new[3]])
         self.angle += 0.0872665
 
-        if t == 11000:
-            self.camera.setPosition([0, -.75, 1.85])
+        if t == 12000:
+            self.camera.setPosition([0.6, -.75, 1.85])
             self.camera.setQuaternion(self.cam_quat)
             self.angle = 0
             self.radius = 0.075
@@ -291,8 +296,13 @@ class Perception():
 
                         # cv.drawContours(rgb, founded_sides, -1, (0, 0, 0), 2)
 
-        if len(rgb) > 0: cv.imshow('OPENCV - rgb', rgb)
-        if len(edges) > 0: cv.imshow('OPENCV - rgaddb', image_sharp)
+
+
+        if len(edges) > 0:
+            cv.namedWindow("Preprocessed Image For Edge Detection",
+                           cv.WINDOW_NORMAL)  # Create window with freedom of dimensions
+
+            cv.imshow('Preprocessed Image For Edge Detection', image_sharp)
 
     def computeObjectInfo(self, id, founded_sides, depth):
 

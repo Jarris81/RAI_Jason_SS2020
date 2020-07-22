@@ -16,8 +16,8 @@ RIGHT_LEFT_X = 1.0
 Primitive/ Movement Constants
 """
 
-OVERHEAD_VIA = 0.2
-MIN_OVERHEAD = 0.0
+OVERHEAD_VIA = 0.3
+MIN_OVERHEAD = 0.25
 
 
 """

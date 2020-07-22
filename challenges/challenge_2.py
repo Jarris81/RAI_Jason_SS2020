@@ -7,9 +7,7 @@ from util.setup import setup_camera
 from util.setup import setup_env_subgoal_2
 from util.transformations import quaternion_from_matrix
 
-
 import util.perception.perception as pt
-
 
 """
 Short example for testing the transition library, 
@@ -30,7 +28,7 @@ if __name__ == "__main__":
 
     # setup env and get background
     R, S, C, V, back_frame = setup_env_subgoal_2(False)
-    cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
+    cameraFrame, fxfypxpy = setup_camera(C)  # the focal length
     tau = .01
     rate_camera = 10
 
@@ -57,14 +55,11 @@ if __name__ == "__main__":
         # time.sleep(0.01)
         perception.step(t)
 
-
-
     while True:
         time.sleep(0.01)
         t += 1
         # frame rate of camera, do perception here
-        if t > 100 and not t%rate_camera:
-
+        if t > 100 and not t % rate_camera:
             panda.set_blocks(perception.computed_blocks)
 
         panda.step(t)
