@@ -112,7 +112,7 @@ def setup_env_subgoal_2(show_background=False):
         name = "obj%i" % o
         box = R.frame(name)
         box.setPosition(positions[o])
-        box.setShape(ry.ST.box, size=[side - i * 0.01, side - i * 0.01, side - i * 0.01])
+        box.setShape(ry.ST.ssBox, size=[side - i * 0.01, side - i * 0.01, side - i * 0.01, 0.001])
         box.setQuaternion([1, 0, 0, 0])
         box.setContact(1)
         box.setColor(color[i])
@@ -200,6 +200,51 @@ def setup_env_subgoal_4(show_background=False):
 
     return R, S, C, V, back_frame
 
+def goal(show_background=False):
+    num_blocks = 8
+    R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+
+    s = 0.13
+    color = [[0, 1, 1], [1, 0, 1], [1, 1, 0], [0, 1, 0],
+             [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
+
+    s = 0.15
+    positions = [
+        [0.2, -0.2, 0.7],
+        [0.2, -0.2, 0.8],
+        [0.2, -0.2, 0.9],
+        [0.2, -0.2, 1.0],
+        [0.2, -0.2, 1.1],
+        [0.2, -0.2, 1.2],
+        [0.2, -0.2, 1.3],
+        [0.2, -0.2, 1.4],
+    ]
+
+    sizes = [
+        [0.3, 0.3, 0.1, 0],
+        [0.28, 0.27, 0.1, 0],
+        [0.25, 0.22, 0.1, 0],
+        [0.18, 0.20, 0.1, 0],
+        [0.15, 0.15, 0.1, 0],
+        [0.12, 0.10, 0.1, 0],
+        [0.10, 0.07, 0.1, 0],
+        [0.06, 0.05, 0.1, 0],
+
+    ]
+    for i in range(num_blocks):
+        name = "obj%i" % i
+        box = R.frame(name)
+        box.setPosition(positions[i])
+        box.setShape(ry.ST.ssBox, sizes[i])
+        box.setQuaternion([1, 0, 0, 0])
+        box.addAttribute("friction", 1.0)
+        box.setContact(1)
+        box.setColor(color[i])
+        box.setMass(10000000)
+
+    C, S, V = _get_CSV(R)
+
+    return R, S, C, V, back_frame
 
 """
 Environment where each object has different colors, for better object recognition in perception
@@ -249,11 +294,11 @@ def setup_color_challenge_env():
             obj_count += 1
 
     for o in range(0, obj_count):
-        color = [[0, 1, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0],
+        color = [[0, 1, 1], [1, 0, 1], [1, 1, 0], [0, 1, 0],
                  [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
         name = "obj%i" % o
-        R.frame(name).setColor(color[o])
         R.frame(name).setContact(1)
+        R.frame(name).setColor(color[o])
 
     S = R.simulation(ry.SimulatorEngine.physx, True)
     S.addSensor("camera")
