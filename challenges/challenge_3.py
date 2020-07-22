@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # setup env and get background
     R, S, C, V, back_frame = setup_env_subgoal_3(False)
-    cameraFrame, fxfypxpy = setup_camera(C)    # the focal length
+    cameraFrame, fxfypxpy = setup_camera(C)  # the focal length
     tau = .01
     rate_camera = 10
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     perception = pt.Perception(R, S, C, V, camera, fxfypxpy)
     perception.init_get_real_colors()
-    perception.runs = True
+    perception.runs = False
 
     t = 0
 
@@ -60,14 +60,14 @@ if __name__ == "__main__":
     num_blocks = 2
 
     while True:
-        t+=1
+        t += 1
         time.sleep(tau)
 
         # frame rate of camera, do perception here
         if t > 200 and not t % rate_camera:
             # set blocks in config and add
-            # panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
-            panda.set_blocks(perception.computed_blocks)
+            panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
+            # panda.set_blocks(perception.computed_blocks)
         panda.step(t)
 
     print("Simulation is done")

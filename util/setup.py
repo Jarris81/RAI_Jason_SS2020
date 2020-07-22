@@ -143,7 +143,7 @@ def setup_env_subgoal_3(show_background=False):
         # [-0.1, .2, 0.65+side/2],
         # [-0.2, -.1, 0.65+side/2],
         # [0.5, .15, 0.65+side/2],
-        [0.13, 0.13, 0.13, 0.0001],
+        [0.13, 0.13, 0.1, 0.0001],
     ]
     for i in range(num_blocks):
         name = "obj%i" % i
@@ -151,6 +151,7 @@ def setup_env_subgoal_3(show_background=False):
         box.setPosition(positions[i])
         box.setShape(ry.ST.ssBox, sizes[i])
         box.setQuaternion([1, 0, 0, 0])
+        box.addAttribute("friction", 1.0)
         box.setColor(color[i])
         box.setContact(1)
 

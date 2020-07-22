@@ -988,7 +988,7 @@ class AngleEdgePlace(Primitive):
         iK = self.C.komo_IK(False)
         block_size = self.C.frame(self.goal).getSize()
         tower_placement = move_to
-        tower_placement[2] += 0.1 + block_size[2] / 2
+        tower_placement[2] += block_size[2] / 2
         # iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=self.mask_gripper)
         # we assume the object is attached to the frame of the gripper, therefore we can simply just
         # tell the goal object should have a position

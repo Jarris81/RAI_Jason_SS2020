@@ -424,7 +424,7 @@ class Perception():
         name = "obj" + str(id)
         obj = self.C.addFrame(name)
         print(self.objects[id]["rgb_color"])
-        obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.0])
+        obj.setShape(ry.ST.ssBox, [obj_sideX, obj_sideY, obj_sideZ, 0.0001])
         obj.setPosition([pos_est[0], pos_est[1], pos_est[2]])
         obj.setMass(0.96)
         obj.setContact(1)
