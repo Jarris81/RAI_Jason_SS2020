@@ -495,7 +495,7 @@ class TopPlace(Primitive):
         iK = self.C.komo_IK(False)
         block_size = self.C.frame(self.goal).getSize()
         tower_placment = move_to
-        tower_placment[2] = tower_placment[2] + (block_size[2] / 4) # really should only be half, but 4 works better
+        tower_placment[2] = tower_placment[2] + ((block_size[2] / 4)) # really should only be half, but 4 works better
 
         iK.addObjective(type=ry.OT.sos, feature=ry.FS.qItself, target=self.q_start, scale=self.mask_gripper)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorX, frames=[self.gripper], target=[0, 1, 0])
@@ -793,7 +793,7 @@ class PushToEdge(Primitive):
         # 3rd via point (to push motion)
         # find the push distance
         block_position_x = self.C.frame(self.goal).getPosition()[0]
-        push_distance = 1 - np.abs(block_position_x)
+        push_distance = 1 - np.abs(block_position_x) - 0.02
         self.C.setJointState(self.q_goal)
         gripper_pose_via_3 = self.C.frame(self.gripper).getPosition()
         gripper_pose_via_3[0] = gripper_pose_via_3[0] + (push_distance * self.push_direction)

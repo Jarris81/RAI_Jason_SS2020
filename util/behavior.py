@@ -72,13 +72,13 @@ class TowerBuilder:
         # add all states
 
         # primitives
-        self.grav_comp = prim.GravComp(C, S, V, tau, 100, vis=False)
-        self.reset = prim.Reset(C, S, V, tau, 5, komo=False, vis=False)
-        self.top_grasp = prim.TopGrasp(C, S, V, tau, 3, komo=False, vis=True)
-        self.top_place = prim.TopPlace(C, S, V, tau, 3, komo=False, vis=False)
+        self.grav_comp = prim.GravComp(C, S, V, tau, 10, vis=False)
+        self.reset = prim.Reset(C, S, V, tau, 1, komo=False, vis=False)
+        self.top_grasp = prim.TopGrasp(C, S, V, tau, 1, komo=False, vis=False)
+        self.top_place = prim.TopPlace(C, S, V, tau, 1, komo=False, vis=False)
         self.pull_in = prim.PullIn(C, S, V, tau, 2, komo=False, vis=False)
         self.push_to_edge = prim.PushToEdge(C, S, V, tau, 3, komo=False, vis=False)
-        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 2, komo=True, vis=False)
+        self.edge_grasp = prim.EdgeGrasp(C, S, V, tau, 2, komo=False, vis=False)
         self.edge_place = prim.EdgePlace(C, S, V, tau, 4, komo=False, vis=False)
         self.edge_drop = prim.AngleEdgePlace(C, S, V, tau, 5, komo=False, vis=False)
         self.drop = prim.Drop(C, S, V, tau, 3, komo=False, vis=False)
@@ -96,7 +96,7 @@ class TowerBuilder:
         self.C = C
         self.V = V
         self.observed_blocks = []
-        self.tower = Tower(C, V, [0.0, -0.3, .7])
+        self.tower = Tower(C, V, [0.0, -.4, .7])
 
         # define list of states
         self.states = [self.grav_comp, self.reset, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop,
@@ -198,6 +198,7 @@ class TowerBuilder:
 
         # return false if no block available to place
         if not len(unplaced_blocks):
+            self.next_gripper = None
             return False
 
         # would have to sort and filter blocks somehow, according to size, distance etc
