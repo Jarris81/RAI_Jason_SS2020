@@ -24,6 +24,10 @@ def cheat_update_obj(obj):
 
 if __name__ == "__main__":
 
+    usePerception = True
+
+    num_blocks = 2
+
     # setup env and get background
     R, S, C, V, back_frame = setup_env_subgoal_1(False)
     cameraFrame, fxfypxpy = setup_camera(C)  # the focal length
@@ -36,23 +40,27 @@ if __name__ == "__main__":
     camera = R.frame("camera")
     camera.setPosition([0, -.85, 1.55])  # TODO could also set in .g file
 
-    perception = pt.Perception(R, S, C, V, camera, fxfypxpy)
-    perception.init_get_real_colors()
-    perception.runs = True
-
     t = 0
 
-    while perception.runs:
-        t += 1
-        # time.sleep(0.01)
-        perception.step(t)
+    if usePerception:
+        perception = pt.Perception(R, S, C, V, camera, fxfypxpy)
+        perception.init_get_real_colors()
+        perception.runs = True
+
+        while perception.runs:
+            t += 1
+            # time.sleep(0.01)
+            perception.step(t)
 
     while True:
-        time.sleep(0.01)
+        time.sleep(tau)
         t += 1
         # frame rate of camera, do perception here
         if t > 100 and not t % rate_camera:
-            panda.set_blocks(perception.computed_blocks)
+            if usePerception:
+                panda.set_blocks(perception.computed_blocks)
+            else:
+                panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
 
         panda.step(t)
 

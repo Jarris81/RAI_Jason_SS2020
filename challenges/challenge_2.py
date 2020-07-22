@@ -26,16 +26,16 @@ def cheat_update_obj(obj):
 
 if __name__ == "__main__":
 
+    # set True if to use perception, else use shortcut
+    usePercption = True
+
     # setup env and get background
     R, S, C, V, back_frame = setup_env_subgoal_2(False)
     cameraFrame, fxfypxpy = setup_camera(C)  # the focal length
     tau = .01
     rate_camera = 10
 
-    state = 0
-
-    hasGoal = False
-
+    # behavior we want for robot
     panda = TowerBuilder(C, S, V, tau)
 
     # for moving camera at start in a circle
@@ -44,23 +44,27 @@ if __name__ == "__main__":
 
     # used for shortcutting perception
     num_blocks = 5
-    perception = pt.Perception(R, S, C, V, camera, fxfypxpy)
-    perception.init_get_real_colors()
-    perception.runs = True
 
     t = 0
 
-    while perception.runs:
-        t += 1
-        # time.sleep(0.01)
-        perception.step(t)
+    if usePercption:
+        perception = pt.Perception(R, S, C, V, camera, fxfypxpy)
+        perception.init_get_real_colors()
+        perception.runs = True
+        while perception.runs:
+            t += 1
+            # time.sleep(0.01)
+            perception.step(t)
 
     while True:
-        time.sleep(0.01)
+        time.sleep(tau)
         t += 1
         # frame rate of camera, do perception here
         if t > 100 and not t % rate_camera:
-            panda.set_blocks(perception.computed_blocks)
+            if usePercption:
+                panda.set_blocks(perception.computed_blocks)
+            else:
+                panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
 
         panda.step(t)
     time.sleep(5)

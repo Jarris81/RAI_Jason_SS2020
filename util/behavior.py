@@ -96,7 +96,7 @@ class TowerBuilder:
         self.C = C
         self.V = V
         self.observed_blocks = []
-        self.tower = Tower(C, V, [0.0, 0, .7])
+        self.tower = Tower(C, V, [0.0, -0.3, .7])
 
         # define list of states
         self.states = [self.grav_comp, self.reset, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop,

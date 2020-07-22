@@ -47,6 +47,7 @@ if __name__ == "__main__":
             # set blocks in config and add
             panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
 
+
         panda.step(t)
     print("Simulation is done")
     time.sleep(5)

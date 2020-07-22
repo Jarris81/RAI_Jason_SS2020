@@ -65,14 +65,16 @@ def setup_env_subgoal_1(show_background=False):
     #     box.setContact(1)
     box1 = R.frame("obj0")
     box1.setShape(ry.ST.ssBox, size=[0.12, 0.12, 0.1, 0.0001])
-    box1.setPosition([0.25, 0.1, 0.7])
+    box1.setPosition([0.25, 0.1, 0.7+0.05])
     box1.setColor([1, 1, 0])
+    box1.setQuaternion([1, 0, 0, 0])
     box1.setContact(1)
 
     box2 = R.frame("obj1")
     box2.setShape(ry.ST.ssBox, size=[0.12, 0.12, 0.1, 0.0001])
-    box2.setPosition([-0.4, 0.2, 0.7])
+    box2.setPosition([-0.4, 0.2, 0.7+ 0.05])
     box2.setColor([0.5, 0, 1])
+    box2.setQuaternion([1, 0, 0, 0])
     box2.setContact(1)
 
     # table = R.frame("table_g")
@@ -89,7 +91,6 @@ def setup_env_subgoal_1(show_background=False):
     table.setColor([0, 0, 0])
     V.setConfiguration(C)
 
-
     return R, S, C, V, back_frame
 
 
@@ -103,8 +104,8 @@ def setup_env_subgoal_2(show_background=False):
     side = 0.13
     positions = [
         [0.3, .3, 0.7 + side / 2],
-        [-0.1, .2, 0.7 + side / 2],
-        [-0.2, -.1, 0.7 + side / 2],
+        [-0.5, .2, 0.7 + side / 2],
+        [-0.3, .2, 0.7 + side / 2],
         [0.5, .15, 0.7 + side / 2],
         [0.6, 0.3, 0.7 + side / 2],
     ]
@@ -112,7 +113,7 @@ def setup_env_subgoal_2(show_background=False):
         name = "obj%i" % o
         box = R.frame(name)
         box.setPosition(positions[o])
-        box.setShape(ry.ST.box, size=[side - i * 0.01, side - i * 0.01, side - i * 0.01])
+        box.setShape(ry.ST.ssBox, size=[side - i * 0.01, side - i * 0.01, side - i * 0.01, 0.01])
         box.setQuaternion([1, 0, 0, 0])
         box.setContact(1)
         box.setColor(color[i])
@@ -161,6 +162,46 @@ def setup_env_subgoal_3(show_background=False):
 
 
 def setup_env_subgoal_4(show_background=False):
+    num_blocks = 5
+    R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
+
+    s = 0.13
+    color = [[0, 1, 1], [1, 0, 1], [1, 1, 0], [0, 1, 0],
+             [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
+
+    s = 0.15
+    positions = [
+        [0.6, 0.1, 0.7 + 0.1 / 2],
+        [-0.6, 0.05, 0.7 + 0.1 / 2],
+        [0.1, 0.3, 0.7 + 0.15 / 2],
+        [0.5, 0.25, 0.7 + 0.14 / 2],
+        [-0.6, 0.3, 0.7 + 0.13 / 2]
+    ]
+
+    sizes = [
+        [0.3, 0.3, 0.1, 0],
+        [0.3, 0.3, 0.1, 0],
+        [0.15, 0.15, 0.15, 0],
+        [0.14, 0.14, 0.14, 0],
+        [0.13, 0.13, 0.13, 0],
+
+    ]
+    for i in range(num_blocks):
+        name = "obj%i" % i
+        box = R.frame(name)
+        box.setPosition(positions[i])
+        box.setShape(ry.ST.ssBox, sizes[i])
+        box.setQuaternion([1, 0, 0, 0])
+        box.addAttribute("friction", 1.0)
+        box.setContact(1)
+        box.setColor(color[i])
+        box.setMass(10000000)
+
+    C, S, V = _get_CSV(R)
+
+    return R, S, C, V, back_frame
+
+def setup_env_max_stack(show_background=False):
     num_blocks = 5
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
 
