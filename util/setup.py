@@ -98,7 +98,7 @@ def setup_env_subgoal_2(show_background=False):
 def setup_env_subgoal_3(show_background=False):
     num_blocks = 2
     R, back_frame = setup_challenge_env(False, num_blocks, show_background=show_background)
-
+    color = [[1, 1, 0], [0, 1, 1]]
     s = 0.13
     positions = [
         [0.9, 0.1, 0.65+0.1/2],
@@ -109,19 +109,19 @@ def setup_env_subgoal_3(show_background=False):
     ]
 
     sizes = [
-        [0.3, 0.3, 0.1, 0],
+        [0.3, 0.3, 0.1, 0.00001],
         # [-0.1, .2, 0.65+side/2],
         # [-0.2, -.1, 0.65+side/2],
         # [0.5, .15, 0.65+side/2],
-        [0.13, 0.13, 0.13, 0.],
+        [0.13, 0.13, 0.13, 0.00001],
     ]
     for i in range(num_blocks):
         name = "obj%i" % i
         box = R.frame(name)
         box.setPosition(positions[i])
-        box.setColor([1, 0, 0])
         box.setShape(ry.ST.ssBox, sizes[i])
         box.setQuaternion([1, 0, 0, 0])
+        box.setColor(color[i])
         box.setContact(1)
 
     C, S, V = _get_CSV(R)

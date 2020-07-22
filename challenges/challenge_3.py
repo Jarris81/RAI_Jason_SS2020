@@ -7,6 +7,8 @@ from util.setup import setup_camera
 from util.setup import setup_env_subgoal_3
 from util.transformations import quaternion_from_matrix
 
+from util.perception.perception import Perception
+
 pathRepo = '/home/jason/git/robotics-course/'
 
 """
@@ -38,17 +40,34 @@ if __name__ == "__main__":
 
     panda = TowerBuilder(C, S, V, tau)
 
+    # for moving camera at start in a circle
+    camera = R.frame("camera")
+    camera.setPosition([0.6, -.85, 1.85])
+
+    perception = Perception(R, S, C, V, camera, fxfypxpy)
+    perception.init_get_real_colors()
+    perception.runs = True
+
+    t = 0
+
+    while perception.runs:
+        t += 1
+        # time.sleep(0.01)
+        perception.step(t)
+
     # used for shortcutting perception
     num_blocks = 2
 
-    for t in range(10000):
+    while True:
+        t += 1
         time.sleep(tau)
 
         # frame rate of camera, do perception here
-        if t > 100 and not t % rate_camera:
+        if t > 200 and not t % rate_camera:
             # set blocks in config and add
-            panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
-
+            # panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
+            panda.set_blocks(perception.computed_blocks)
         panda.step(t)
+
     print("Simulation is done")
     time.sleep(5)
