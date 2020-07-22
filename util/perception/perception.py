@@ -28,7 +28,7 @@ class Perception():
         self.seen_obj = None
 
         self.computed_blocks = []
-        self.runs = True
+        self.runs = False
 
     def step(self, t):
         if t % self.rate_camera == 0:

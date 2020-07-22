@@ -65,14 +65,16 @@ def setup_env_subgoal_1(show_background=False):
     #     box.setContact(1)
     box1 = R.frame("obj0")
     box1.setShape(ry.ST.ssBox, size=[0.12, 0.12, 0.1, 0.0001])
-    box1.setPosition([0.25, 0.1, 0.7])
+    box1.setPosition([0.25, 0.1, 0.1/2 + 0.7])
+    box1.setQuaternion([1, 0, 0, 0])
     box1.setColor([1, 1, 0])
     box1.setContact(1)
 
     box2 = R.frame("obj1")
     box2.setShape(ry.ST.ssBox, size=[0.12, 0.12, 0.1, 0.0001])
-    box2.setPosition([-0.4, 0.2, 0.7])
+    box2.setPosition([-0.4, 0.2, +0.1/2 + 0.7])
     box2.setColor([0.5, 0, 1])
+    box2.setQuaternion([1, 0, 0, 0])
     box2.setContact(1)
 
     # table = R.frame("table_g")

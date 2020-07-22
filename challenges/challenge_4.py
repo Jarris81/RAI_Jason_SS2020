@@ -3,6 +3,7 @@ import time
 import libry as ry
 
 from util.behavior import TowerBuilder
+from util.behavior import PickNPlace
 from util.setup import setup_camera
 from util.setup import setup_env_subgoal_4
 from util.transformations import quaternion_from_matrix
@@ -34,19 +35,21 @@ if __name__ == "__main__":
     tau = .01
     rate_camera = 10
 
-    panda = TowerBuilder(C, S, V, tau)
+    panda = PickNPlace(C, S, V, tau)
 
     # used for shortcutting perception
     num_blocks = 5
 
-    for t in range(100000):
-        time.sleep(tau)
 
-        # frame rate of camera, do perception here
-        if t > 200 and not t % rate_camera:
-            # set blocks in config and add
-            panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
-
-        panda.step(t)
-    print("Simulation is done")
-    time.sleep(5)
+    # for t in range(100000):
+    #     time.sleep(tau)
+    #
+    #     # frame rate of camera, do perception here
+    #     if t > 200 and not t % rate_camera:
+    #         # set blocks in config and add
+    #         i =0
+    #         #panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
+    #
+    #     panda.step(t)
+    # print("Simulation is done")
+    # time.sleep(5)
