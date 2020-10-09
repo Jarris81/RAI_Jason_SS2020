@@ -100,7 +100,7 @@ class TowerBuilder:
 
         # define list of states
         self.states = [self.grav_comp, self.reset, self.top_grasp, self.top_place, self.edge_grasp, self.edge_drop,
-                       self.drop, self.push_to_edge, self.edge_place, self.move_away]
+                       self.drop, self.push_to_edge, self.edge_place, self.move_away, self.pull_in]
 
         # create finite state machine
         self.fsm = Machine(states=self.states, initial=self.grav_comp,
@@ -132,6 +132,10 @@ class TowerBuilder:
         self.fsm.add_transition("do_push_to_edge", source=self.grav_comp, dest=self.push_to_edge,
                                 conditions=[self._has_Goal, self._do_push_to_edge])
         self.fsm.add_transition("done_push", source=self.push_to_edge, dest=self.grav_comp, conditions=self._is_done)
+        # PULL
+        self.fsm.add_transition("do_pull_in", source=self.grav_comp, dest=self.pull_in,
+                                conditions=[self._has_Goal, self._do_pull_in])
+        self.fsm.add_transition("done_push", source=self.pull_in, dest=self.grav_comp, conditions=self._is_done)
 
         # transitions returning to grav comp after placing block
         self.fsm.add_transition("is_done_placing", source=[self.top_place],
@@ -239,6 +243,11 @@ class TowerBuilder:
         :param block:
         :return:
         """
+        block_pos = self.C.frame(block).getPosition()
+        if block_pos[2] < 0.6:
+            return False
+        if not const.BLOCK_Y_LOWER_LIMIT < block_pos[1] < const.BLOCK_Y_UPPER_LIMIT:
+            return False
         return block not in self.tower.get_blocks()
 
     def _get_block_utility(self, block):
@@ -278,7 +287,7 @@ class TowerBuilder:
         if not self.goal:
             return False
         goal_position = self.C.frame(self.goal).getPosition()
-        push_to_edge_y_limits = np.array([-0.1, 0.2])
+        push_to_edge_y_limits = np.array([-0.1, 0.3])
         if not push_to_edge_y_limits[0] < goal_position[1] < push_to_edge_y_limits[-1]:
             return False
 
@@ -299,7 +308,7 @@ class TowerBuilder:
         if not self.goal:
             return False
         goal_position = self.C.frame(self.goal).getPosition()
-        push_to_edge_y_limits = np.array([-0.1, 0.2])
+        push_to_edge_y_limits = np.array([-0.1, 0.1])
         if not push_to_edge_y_limits[0] < goal_position[1] < push_to_edge_y_limits[-1]:
             return False
 
@@ -320,8 +329,8 @@ class TowerBuilder:
         if not self.goal:
             return False
         # TODO: check if block is not too far away
-        table_right_edge_xy_limit = np.array([0.85, -0.15, 1.0, 0.12])
-        table_left_edge_xy_limit = np.array([-1.0, -0.15, -0.85, 0.12])
+        table_right_edge_xy_limit = np.array([0.85, -0.1, 1.0, 0.2])
+        table_left_edge_xy_limit = np.array([-1.0, -0.1, -0.85, 0.2])
         # check if block is located at edge
         goal_position = self.C.frame(self.goal).getPosition()
         is_right_edge = np.all(table_right_edge_xy_limit[:2] < goal_position[:2]) and \

@@ -43,7 +43,7 @@ if __name__ == "__main__":
         time.sleep(tau)
 
         # frame rate of camera, do perception here
-        if t > 1000 and not t % rate_camera:
+        if t > 100 and not t % rate_camera:
             # set blocks in config and add
             panda.set_blocks([cheat_update_obj("obj%i" % i) for i in range(num_blocks)])
 

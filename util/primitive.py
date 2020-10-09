@@ -695,7 +695,7 @@ class PullIn(Primitive):
         iK = self.C.komo_IK(False)
         self.C.setJointState(self.q_goal)
         gripper_pos_after_push = self.C.frame(self.gripper).getPosition()
-        gripper_pos_after_push[1] = gripper_pos_after_push[1] - 0.1  # TODO calculate actual distance
+        gripper_pos_after_push[1] = gripper_pos_after_push[1] - 0.2  # TODO calculate actual distance
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.position, frames=[self.gripper],
                         target=gripper_pos_after_push, scale=[1e1] * 3)
         iK.addObjective(type=ry.OT.eq, feature=ry.FS.vectorX, frames=[self.gripper], target=[1, 0, 0])

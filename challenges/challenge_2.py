@@ -27,7 +27,7 @@ def cheat_update_obj(obj):
 if __name__ == "__main__":
 
     # set True if to use perception, else use shortcut
-    usePercption = True
+    usePercption = False
 
     # setup env and get background
     R, S, C, V, back_frame = setup_env_subgoal_2(False)

@@ -19,6 +19,9 @@ Primitive/ Movement Constants
 OVERHEAD_VIA = 0.3
 MIN_OVERHEAD = 0.25
 
+BLOCK_Y_LOWER_LIMIT = -1.0
+BLOCK_Y_UPPER_LIMIT = 1.5
+
 
 """
 Name constants

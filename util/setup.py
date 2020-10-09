@@ -133,11 +133,11 @@ def setup_env_subgoal_3(show_background=False):
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
 
     positions = [
-        [0.9, 0.1, 0.65 + 0.1 / 2],
+        [0.6, 0.2, 0.65 + 0.1 / 2],
         # [-0.1, .2, 0.65+side/2],
         # [-0.2, -.1, 0.65+side/2],
         # [0.5, .15, 0.65+side/2],
-        [0.6, 0.3, 0.65 + 0.13 / 2]
+        [-0.6, 0.3, 0.65 + 0.13 / 2]
     ]
 
     sizes = [
@@ -281,7 +281,7 @@ def setup_env_max_stack(show_background=False):
         box.setPosition(positions[i, :])
 
         box.setQuaternion([1, 0, 0, 0])
-        box.setShape(ry.ST.ssBox, size=[side - i * 0.005, side - i * 0.005, side - i * 0.005, 0.001])
+        box.setShape(ry.ST.box, size=[side - i * 0.005, side - i * 0.005, side - i * 0.005]) # 0.001
         box.addAttribute("friction", 1.0)
         box.setContact(1)
         box.setColor(color[i])
